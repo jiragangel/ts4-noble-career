@@ -131,3 +131,43 @@ def _find_partner(first_name: str = '', last_name: str = '', _connection=None):
     except Exception as e:
         output(f"Script Error: {str(e)}")
         return False
+
+@sims4.commands.Command('set_all_household_funds', command_type=sims4.commands.CommandType.Cheat)
+def set_all_household_funds(amount: int = 100000, _connection=None):
+    output = sims4.commands.CheatOutput(_connection)
+
+    output("Command started...")  # debug line
+
+    try:
+        household_manager = services.household_manager()
+
+        if household_manager is None:
+            output("Error: Household manager not found.")
+            return
+
+        count = 0
+
+        for household in household_manager.get_all():
+            try:
+                if household is None:
+                    continue
+
+                output(f"Current fund {household.funds.money}")
+                
+                # for attr in dir(household.funds):
+                #     try:
+                #         value = getattr(household.funds, attr)
+                #         output(f"{attr}: {type(value)}")
+                #     except Exception as e:
+                #         output(f"{attr}: <error reading> {e}")
+                household.funds.add(1000000, 1)
+                output(f"New fund {household.funds.money}")
+                count += 1
+
+            except Exception as e:
+                output(f"Failed for one household: {e}")
+
+        output(f"Done! Updated {count} households to {amount} simoleons.")
+
+    except Exception as e:
+        output(f"Critical error: {e}")
