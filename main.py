@@ -81,8 +81,16 @@ def _find_partner(first_name: str = '', last_name: str = '', _connection=None):
             if sim.sim_id == target_sim.sim_id:
                 continue
             if sim.age == target_age and sim.gender != target_gender:
-                match_sim = sim
-                break 
+                # NEW: Check if this Sim already has a partner bit with ANYONE
+                has_partner = False
+                for bit in sim.relationship_tracker.get_all_bits():
+                    if bit.guid64 == 15825:
+                        has_partner = True
+                        break
+                
+                if not has_partner:
+                    match_sim = sim
+                    break
 
         if match_sim is None:
             output(f"Could not find a matching Sim of age {target_age} and opposite sex.")
@@ -95,10 +103,12 @@ def _find_partner(first_name: str = '', last_name: str = '', _connection=None):
 
         # 5. Define Tuning IDs
         partner_bit_id = 15825 # Married
+        has_met_bit_id = 15803
         friend_track_id = 16650 # Friendship
         romance_track_id = 16651 # Romance
 
         partner_bit = bit_manager.get(partner_bit_id)
+        has_met_bit = bit_manager.get(has_met_bit_id)
         friend_track = stat_manager.get(friend_track_id)
         romance_track = stat_manager.get(romance_track_id)
 
@@ -109,6 +119,7 @@ def _find_partner(first_name: str = '', last_name: str = '', _connection=None):
         # 6. Apply Relationship Bit and Max Scores (100)
         # This creates the relationship connection
         target_sim.relationship_tracker.add_relationship_bit(match_sim.sim_id, partner_bit)
+        target_sim.relationship_tracker.add_relationship_bit(match_sim.sim_id, has_met_bit)
         
         # This fills the bars
         target_sim.relationship_tracker.set_relationship_score(match_sim.sim_id, 100, friend_track)
