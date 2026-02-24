@@ -1,7 +1,41 @@
 import services # type: ignore
 import sims4.commands # type: ignore
 from sims.sim_info_types import Gender # type: ignore
-from relationships.relationship_bit import RelationshipBit # type: ignore
+
+@sims4.commands.Command('increase_celebrity_by_lastname', command_type=sims4.commands.CommandType.Live)
+def increase_celebrity_by_lastname(last_name: str, fame_points: int = 1000, _connection=None):
+    output = sims4.commands.CheatOutput(_connection)
+
+    try:
+        sim_manager = services.sim_info_manager()
+        target_sim = None
+
+        # Find sim by last name
+        for sim_info in sim_manager.get_all():
+            if sim_info.last_name.lower() == last_name.lower():
+                target_sim = sim_info
+
+                # Get Fame commodity from Commodity Manager
+                commodity_manager = services.get_instance_manager(sims4.resources.Types.STATISTIC)
+                fame_commodity = commodity_manager.get(188229)
+
+                if fame_commodity is None:
+                    output("Fame commodity not found. Is Get Famous installed?")
+                    return
+
+                commodity_tracker = target_sim.commodity_tracker
+                if commodity_tracker is None:
+                    output("Sim has no commodity tracker.")
+                    return
+
+                # Increase fame
+                commodity_tracker.add_value(fame_commodity, fame_points)
+
+                output(f"{target_sim.first_name} {target_sim.last_name}'s celebrity level increased by {fame_points} points!")
+
+    except Exception as e:
+        output("An unexpected error occurred while increasing celebrity level.")
+        sims4.log.exception("CelebrityCheat", "Error in increase_celebrity_by_lastname", exc=e)
 
 @sims4.commands.Command('add_noble_career', command_type=sims4.commands.CommandType.Live)
 def _add_noble_career(last_name: str = '', _connection=None):
@@ -171,3 +205,13 @@ def set_all_household_funds(amount: int = 100000, _connection=None):
 
     except Exception as e:
         output(f"Critical error: {e}")
+
+@sims4.commands.Command('jira.help', command_type=sims4.commands.CommandType.Cheat)
+def set_all_household_funds(_connection=None):
+    output = sims4.commands.CheatOutput(_connection)
+    output("def increase_celebrity_by_lastname(last_name: str, fame_points: int = 1000, _connection=None)")
+    output("def _add_noble_career(last_name: str = '', _connection=None)")
+    output("def sayhello(_connection=None)")
+    output("def _find_partner(first_name: str = '', last_name: str = '', _connection=None)")
+    output("def set_all_household_funds(amount: int = 100000, _connection=None)")
+
