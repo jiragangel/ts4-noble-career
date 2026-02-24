@@ -1,5 +1,7 @@
 import services # type: ignore
 import sims4.commands # type: ignore
+from sims.sim_info_types import Gender # type: ignore
+from relationships.relationship_bit import RelationshipBit # type: ignore
 
 @sims4.commands.Command('add_noble_career', command_type=sims4.commands.CommandType.Live)
 def _add_noble_career(last_name: str = '', _connection=None):
@@ -48,3 +50,73 @@ def _add_noble_career(last_name: str = '', _connection=None):
 def sayhello(_connection=None):
     output = sims4.commands.CheatOutput(_connection)
     output('Hello World')
+
+@sims4.commands.Command('find_partner', command_type=sims4.commands.CommandType.Live)
+def _find_partner(first_name: str = '', last_name: str = '', _connection=None):
+    output = sims4.commands.CheatOutput(_connection)
+    
+    if not first_name or not last_name:
+        output("Usage: find_partner [First] [Last]")
+        return False
+
+    try:
+        # 1. Find the Target Sim
+        target_sim = None
+        for sim in services.sim_info_manager().get_all():
+            if sim.first_name.lower() == first_name.lower() and sim.last_name.lower() == last_name.lower():
+                target_sim = sim
+                break
+                
+        if target_sim is None:
+            output(f"Error: Target Sim {first_name} {last_name} not found.")
+            return False
+
+        # 2. Match Criteria
+        target_age = target_sim.age
+        target_gender = target_sim.gender
+        match_sim = None
+
+        # 3. Search for a Match
+        for sim in services.sim_info_manager().get_all():
+            if sim.sim_id == target_sim.sim_id:
+                continue
+            if sim.age == target_age and sim.gender != target_gender:
+                match_sim = sim
+                break 
+
+        if match_sim is None:
+            output(f"Could not find a matching Sim of age {target_age} and opposite sex.")
+            return False
+
+        # 4. Get Managers (Using STATISTIC for the tracks)
+        bit_manager = services.get_instance_manager(sims4.resources.Types.RELATIONSHIP_BIT)
+        # FIX: Relationship Tracks are found in the STATISTIC manager
+        stat_manager = services.get_instance_manager(sims4.resources.Types.STATISTIC)
+
+        # 5. Define Tuning IDs
+        partner_bit_id = 15825 # Married
+        friend_track_id = 16650 # Friendship
+        romance_track_id = 16651 # Romance
+
+        partner_bit = bit_manager.get(partner_bit_id)
+        friend_track = stat_manager.get(friend_track_id)
+        romance_track = stat_manager.get(romance_track_id)
+
+        if not all([partner_bit, friend_track, romance_track]):
+            output("Error: Could not load Relationship Bit or Statistic Tracks.")
+            return False
+
+        # 6. Apply Relationship Bit and Max Scores (100)
+        # This creates the relationship connection
+        target_sim.relationship_tracker.add_relationship_bit(match_sim.sim_id, partner_bit)
+        
+        # This fills the bars
+        target_sim.relationship_tracker.set_relationship_score(match_sim.sim_id, 100, friend_track)
+        target_sim.relationship_tracker.set_relationship_score(match_sim.sim_id, 100, romance_track)
+
+        output(f"Success! {target_sim.first_name} and {match_sim.first_name} are now a Power Couple.")
+        return True
+
+    except Exception as e:
+        output(f"Script Error: {str(e)}")
+        return False
