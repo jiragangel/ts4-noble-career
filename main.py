@@ -1,6 +1,7 @@
 import services # type: ignore
 import sims4.commands # type: ignore
-from sims.sim_info_types import Gender # type: ignore
+import random
+from sims4.resources import Types # pyright: ignore[reportMissingImports]
 
 @sims4.commands.Command('increase_celebrity_by_lastname', command_type=sims4.commands.CommandType.Live)
 def increase_celebrity_by_lastname(last_name: str, fame_points: int = 1000, _connection=None):
@@ -215,3 +216,84 @@ def set_all_household_funds(_connection=None):
     output("def _find_partner(first_name: str = '', last_name: str = '', _connection=None)")
     output("def set_all_household_funds(amount: int = 100000, _connection=None)")
 
+@sims4.commands.Command('randomize_new_occults', command_type=sims4.commands.CommandType.Live)
+def _randomize_new_occults(_connection=None):
+    output = sims4.commands.CheatOutput(_connection)
+    
+    # Define primary Occult Trait IDs
+    OCCULT_TRAITS = {
+        'Fairy': 433287,
+        'Mermaid': 199043,
+        'Witch': 213050,     # Spellcaster
+        'Werewolf': 289780,
+        'Vampire': 149527,
+    }
+
+    try:
+        trait_manager = services.get_instance_manager(Types.TRAIT)
+        if trait_manager is None:
+            output("Error: Could not access Trait Manager. Game state may be unstable.")
+            return False
+
+        all_sims = services.sim_info_manager().get_all()
+        count = 0
+        skipped = 0
+        errors = 0
+        
+        for sim_info in all_sims:
+            try:
+                output(f"starting for {sim_info.first_name} {sim_info.last_name}")
+                # 2. Check if Sim is already an Occult using the Trait list
+                # This is the most reliable way to avoid 'No module' errors
+                is_already_occult = False
+                for tid in OCCULT_TRAITS.values():
+                    t_tuning = trait_manager.get(tid)
+                    if t_tuning and sim_info.has_trait(t_tuning):
+                        is_already_occult = True
+                        break
+
+                if is_already_occult:
+                    skipped += 1
+                    output(f"{sim_info.first_name} {sim_info.last_name} is already an occult")
+                    continue
+
+                if sim_info.is_child_or_younger:
+                    output(f"{sim_info.first_name} {sim_info.last_name} is a child")
+                    continue
+
+                # 3. Randomization Logic (50% chance to convert)
+                if random.random() > 0.5:
+                    choice_name = random.choice(list(OCCULT_TRAITS.keys()))
+                    target_id = OCCULT_TRAITS[choice_name]
+                    
+                    output(f"{sim_info.first_name} {sim_info.last_name} will have {choice_name}")
+
+                    # 4. Defensive Tuning Check (Handles missing DLC)
+                    new_trait = trait_manager.get(target_id)
+                    output(f"{sim_info.first_name} {sim_info.last_name} will have trait added")
+                    if new_trait is not None:
+                        sim_info.add_trait(new_trait)
+                        count += 1
+                        if new_trait == 433287:
+                            sim_info.add_trait(trait_manager.get(414620))
+                    else:
+                        # This happens if the user doesn't own the specific pack
+                        pass 
+
+            except Exception as e:
+                # Catch errors for individual Sims so one bad Sim doesn't break the whole loop
+                output(f"Failed to process Sim {sim_info.first_name}: {e}")
+                errors += 1
+                continue
+
+        output(f"Finished! Converted {count} humans. Skipped {skipped} existing occults.")
+        if errors > 0:
+            output(f"Note: {errors} Sims encountered errors during processing.")
+        
+        return True
+
+    except Exception as e:
+        # Catch major system-level errors
+        output(f"Critical Script Error: {str(e)}")
+        return False
+    
