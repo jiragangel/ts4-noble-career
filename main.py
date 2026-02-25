@@ -2,6 +2,9 @@ import services # type: ignore
 import sims4.commands # type: ignore
 import random
 from sims4.resources import Types # pyright: ignore[reportMissingImports]
+from sims.sim_info_types import Gender # type: ignore
+import os
+from datetime import datetime
 
 @sims4.commands.Command('increase_celebrity_by_lastname', command_type=sims4.commands.CommandType.Live)
 def increase_celebrity_by_lastname(last_name: str, fame_points: int = 1000, _connection=None):
@@ -297,3 +300,102 @@ def _randomize_new_occults(_connection=None):
         output(f"Critical Script Error: {str(e)}")
         return False
     
+def get_spouse_info_by_id(sim_id):
+    """
+    Core function to safely retrieve a spouse's SimInfo object.
+    """
+    sim_info_manager = services.sim_info_manager()
+    sim_info = sim_info_manager.get(sim_id)
+    
+    if sim_info is None:
+        return None
+
+    # Use the built-in spouse_sim_id property
+    # This returns 0 if they are not married
+    spouse_id = sim_info.spouse_sim_id
+    
+    if spouse_id:
+        return sim_info_manager.get(spouse_id)
+    
+    return None
+
+@sims4.commands.Command('jira.rtmn', command_type=sims4.commands.CommandType.Live)
+def _randomize_townie_marriage_names(_connection=None):
+    output = sims4.commands.CheatOutput(_connection)
+    
+    # 1. Path Setup
+    log_file_path = "REPLACE_PATH_HERE"
+    try:
+        os.makedirs(os.path.dirname(log_file_path), exist_ok=True)
+    except Exception as e:
+        output(f"FileSystem Error: {str(e)}")
+        return False
+
+    # 2. Name Lists
+    surnames = ["Auremont","Valcour","Beauchamp","Montclair","Devereux","Rochefort","Bellamont","Fontainebleau","Charlemont","Villeneuve","Saintclair","D’Aurelle","Lafayette","Montpellier","Argenvale","Marceau","Delacroix","Beauregard","Clairmont","Vallencourt","Montreval","Duvalier","Saint-Roche","Lavellemont","Aurelmont","Belcour","Montferrand","Carlemont","Valenbourg","Rosenwald","Von Albrecht","Von Eisenberg","Von Falkenrath","Von Silvermark","Von Winterfeld","Von Greifen","Hohenberg","Hohenwald","Schwarzenfels","Edelstein","Kronenberg","Lichtenwald","Sturmfels","Adelbrecht","Kaiserwald","Falkenstein","Rosenfeld","Windermark","Goldschmidt","Silbermann","Nordheim","Wolfsberg","Steinmark","Bergwald","Ehrenfels","Grünwald","Himmelreich","Di Laurentis","De Medoria","Bellavigna","Rosenthalis","Montesanti","Valentori","Caravelli","San Aurelio","Marcellini","Altamonte","Venturius","Castiglione","Bellatorre","D’Argento","Serenelli","Lucentio","Vittorani","Fontanelli","De Valois","De Montfort","De Lorraine","De Navarre","De Bourmont","De Rochebrune","De Clairvaux","De Saint-Mer","Von Ravensbruck","Von Nighthelm","Von Solisburg","Von Helmswald","Von Eisenhart"]
+    female_royal_names = ["Adelina","Aurelia","Beatrice","Celestine","Charlotte","Clarissa","Clementine","Cordelia","Daphne","Eleanor","Elisabeth","Emmeline","Evangeline","Florence","Genevieve","Helena","Isabella","Josephine","Juliana","Leonora","Lucinda","Marguerite","Matilda","Ophelia","Penelope","Seraphina","Theodora","Valentina","Veronica","Victoria","Arabella","Anastasia","Antonia","Bianca","Camilla","Cassandra","Catalina","Constanza","Dorothea","Elvira","Estella","Francesca","Gabriella","Georgiana","Giselle","Henrietta","Iolanthe","Isolde","Jacqueline","Lavinia","Leontine","Lisette","Magdalena","Marceline","Mirabella","Octavia","Philomena","Rosalind","Sabina","Tatiana","Viola","Wilhelmina","Zenobia","Amalia","Bernadette","Cosima","Delphine","Eudora","Faustina","Imogen","Juliette","Katarina","Lorraine","Marcella","Natalia","Oriana","Persephone","Renata","Solenne","Theresia","Ursula","Violetta","Yvette","Zara","Alessandra","Brigitta","Carolina","Desdemona","Eleanora","Felicity","Guinevere","Honoria","Isabella-Marie","Julianna","Klementina","Lucienne","Margot","Noemi","Odette","Pauline","Querida","Rowena","Sigrid","Tallulah","Ulrika","Viviana","Winifred","Xanthe","Yolanda","Zelina","Auriane","Belladonna","Corinna","Dominique","Euphemia","Fiametta","Griselda","Hortensia","Isadora","Justina","Karolina","Leticia","Monique","Nerissa","Olympia","Prudence","Rosamund","Silvia","Tiberia","Vespera","Wilma","Xenia","Ysaline","Zita","Adrianna","Brunhilda","Cecilia","Delfina","Elodie","Fabienne","Galatea","Helene","Ilona","Jessamine","Katriel","Lucasta","Mireille","Nadine","Ottilie","Petronella","Roxanne","Selena","Thalia","Ursa","Verena","Wisteria","Xylia","Ysadora","Zophia"]
+    male_royal_names = ["Adrian","Alaric","Alexander","Ambrose","Anselm","Arthur","Augustus","Benedict","Cassius","Cedric","Constantine","Cornelius","Darius","Dominic","Edmund","Edward","Emilian","Felix","Frederick","Gabriel","Hadrian","Henry","Hugo","Ignatius","Isidore","Jasper","Julius","Laurence","Leopold","Lucian","Magnus","Marcellus","Maximilian","Nathaniel","Octavian","Percival","Quentin","Raphael","Sebastian","Theodore","Valerian","Victor","Wilhelm","Xavier","Zacharias","Aurelian","Bernard","Caius","Demetrius","Elias","Florian","Gareth","Horatio","Ibrahim","Julian","Konrad","Leonard","Matthias","Nicholas","Orlando","Philip","Roderick","Stefan","Tiberius","Ulrich","Vladimir","Wenceslas","Xerxes","Yorick","Zephyr","Alphonse","Balthazar","Casimir","Desmond","Erasmus","Ferdinand","Gregory","Hector","Inigo","Justinian","Karl","Lysander","Marius","Nikolai","Oberon","Pascal","Reinhardt","Silvester","Tristan","Ulysses","Valentino","Wolfgang","Xanthus","Yvain","Zoltan","Anatole","Boris","Clement","Dorian","Emerson","Fabian","Gerard","Havelock","Icarus","Jerome","Kallias","Lorenzo","Mortimer","Nestor","Oswald","Prospero","Rufus","Simeon","Thaddeus","Urban","Virgil","Wallace","Xylon","Yuri","Zeno","Abelard","Bertrand","Cyril","Draven","Evander","Francis","Gustav","Harlan","Ivor","Jacques","Killian","Lucius","Mordecai","Neville","Olivier","Phineas","Remington","Stellan","Titus","Vaughn","Wilfred","Ximeno","Yago","Zoran"]
+    
+    with open(log_file_path, "a", encoding="utf-8") as log_file:
+        log_file.write(f"\n--- Session Start: {datetime.now()} ---\n")
+        
+        try:
+            active_household_id = services.active_household_id()
+            
+            processed_sim_ids = set()
+            count = 0
+            error_count = 0
+
+            all_sims = list(services.sim_info_manager().get_all())
+
+            for sim_info in all_sims:
+                if sim_info is None or not hasattr(sim_info, 'sim_id'):
+                    continue
+
+                if not surnames:
+                    break
+
+                if sim_info.sim_id in processed_sim_ids or sim_info.household_id == active_household_id:
+                    continue
+
+                if sim_info.gender != Gender.FEMALE: 
+                    continue
+
+                try:
+                    spouse_info = get_spouse_info_by_id(sim_info.sim_id)
+                    
+                    if spouse_info:
+                        new_surname = random.choice(surnames)
+                        surnames.remove(new_surname)
+                        
+                        new_female_fn = random.choice(female_royal_names)
+                        new_male_fn = random.choice(male_royal_names)
+
+                        old_names = f"{sim_info.first_name} {sim_info.last_name} & {spouse_info.first_name} {spouse_info.last_name}"
+                        
+                        sim_info.first_name = new_female_fn
+                        sim_info.last_name = new_surname
+                        spouse_info.first_name = new_male_fn
+                        spouse_info.last_name = new_surname
+                        
+                        processed_sim_ids.add(sim_info.sim_id)
+                        processed_sim_ids.add(spouse_info.sim_id)
+                        
+                        count += 1
+                        log_msg = f"SUCCESS: {old_names} -> {new_female_fn} & {new_male_fn} {new_surname}"
+                        output(log_msg)
+                        log_file.write(log_msg + "\n")
+
+                except Exception as e:
+                    log_file.write(f"ERR Sim {sim_info.sim_id}: {str(e)}\n")
+                    error_count += 1
+
+            final_msg = f"Completed. Updated {count} couples. Errors: {error_count}"
+            output(final_msg)
+            log_file.write(final_msg + "\n")
+            return True
+
+        except Exception as e:
+            output(f"Crash: {str(e)}")
+            log_file.write(f"FATAL: {str(e)}\n")
+            return False
