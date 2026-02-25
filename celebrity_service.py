@@ -6,7 +6,7 @@ def increase_sim_celebrity(last_name: str, fame_points: int, output_func):
     try:
         sim_manager = services.sim_info_manager()
         for sim_info in sim_manager.get_all():
-            if sim_info.last_name.lower() == last_name.lower():
+            if sim_info.last_name.lower() == last_name.lower() or (not last_name and sim_info.is_teen_or_older):
                 commodity_manager = services.get_instance_manager(Types.STATISTIC)
                 fame_commodity = commodity_manager.get(Constants.FAME) # Fame ID
 
