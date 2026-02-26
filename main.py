@@ -16,6 +16,11 @@ def _add_noble_career(last_name: str = '', _connection=None):
     output = sims4.commands.CheatOutput(_connection)
     career_service.add_noble_career_to_sim(last_name, output)
 
+@sims4.commands.Command('add_random_career', command_type=sims4.commands.CommandType.Live)
+def _add_random_career(last_name: str = '', _connection=None):
+    output = sims4.commands.CheatOutput(_connection)
+    career_service.add_random_career(output)
+
 @sims4.commands.Command('find_partner', command_type=sims4.commands.CommandType.Live)
 def _find_partner(first_name: str = '', last_name: str = '', _connection=None):
     output = sims4.commands.CheatOutput(_connection)

@@ -3,6 +3,24 @@ from sims4.resources import Types # type: ignore
 from tuning_ids import Constants
 import random
 
+def add_random_career(output_func):
+    instance_manager = services.get_instance_manager(Types.CAREER)
+
+    for sim_info in services.sim_info_manager().get_all():
+        if sim_info.is_young_adult or sim_info.is_adult:
+            tracker = sim_info.career_tracker
+            if tracker is None:
+                return None
+            
+            output_func(f"{sim_info.first_name} {sim_info.last_name} has {len(tracker.careers.values())} career")
+
+            if (len(tracker.careers.values()) == 0):
+                # Instantiate and add career
+                career_tuning = instance_manager.get(random.choice([Constants.BUSINESS, Constants.CULINARY, Constants.ENTERTAINER]))
+                new_career_instance = career_tuning(sim_info)
+                sim_info.career_tracker.add_career(new_career_instance)
+                output_func(f"Added career to {sim_info.first_name} {sim_info.last_name}")
+
 def add_noble_career_to_sim(last_name: str, output_func):
     search_last = last_name.strip().lower()
     noble_career_id = Constants.NOBLE
