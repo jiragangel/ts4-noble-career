@@ -15,6 +15,24 @@ def add_noble_career_to_sim(last_name: str, output_func):
             sim_info.career_tracker.add_career(new_career_instance)
             output_func(f"Added Noble career to {sim_info.first_name} {sim_info.last_name}")
 
+def getNobleCareerInstance(sim_info, output_func):
+    career_manager = services.get_instance_manager(Types.CAREER)
+    Career_noble = career_manager.get(Constants.NOBLE) 
+    if not sim_info.is_teen_or_older:
+        return None
+
+    tracker = sim_info.career_tracker
+    if tracker is None:
+        return None
+
+    for career_instance in tracker.careers.values():
+        if isinstance(career_instance, Career_noble):
+            output_func(f"Processing Noble: {sim_info.first_name} {sim_info.last_name}")
+            return career_instance
+    
+    return None
+
+
 def promote_noble_dynasty(output_func):
     # 1. Get the Noble Career class from the instance manager
     # Replace 123456789 with your career's Decimal Tuning ID
@@ -37,17 +55,16 @@ def promote_noble_dynasty(output_func):
             continue
 
         try:
-            for career_instance in tracker.careers.values():
-                if isinstance(career_instance, Career_noble):
-                    output_func(f"Processing Noble: {sim_info.first_name} {sim_info.last_name}")
-                    
-                    promotions_given = 0
-                    for _ in range(5):
-                        career_instance.promote()
-                        promotions_given += 1
-                    
-                    output_func(f"{sim_info.first_name} {sim_info.last_name}  - Successfully promoted {promotions_given} times.")
-                    success_count += 1
+            career_instance = getNobleCareerInstance(sim_info, output_func)
+
+            if not career_instance is None:
+                promotions_given = 0
+                for _ in range(5):
+                    career_instance.promote()
+                    promotions_given += 1
+                
+                output_func(f"{sim_info.first_name} {sim_info.last_name}  - Successfully promoted {promotions_given} times.")
+                success_count += 1
                     
         except Exception as e:
             # Log specific errors without stopping the whole loop

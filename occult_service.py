@@ -3,7 +3,13 @@ import random
 from sims4.resources import Types # type: ignore
 from tuning_ids import Constants
 
-OCCULT_TRAITS = {'Fairy': Constants.FAIRY, 'Mermaid': Constants.MERMAID, 'Witch': Constants.WITCH, 'Werewolf': Constants.WEREWOLF, 'Vampire': Constants.VAMPIRE}
+OCCULT_TRAITS = {
+    'Fairy': Constants.FAIRY, 
+    'Mermaid': Constants.MERMAID, 
+    'Witch': Constants.WITCH, 
+    'Werewolf': Constants.WEREWOLF, 
+    'Vampire': Constants.VAMPIRE
+}
 
 def randomize_occults(output_func):
     trait_manager = services.get_instance_manager(Types.TRAIT)
