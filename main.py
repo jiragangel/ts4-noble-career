@@ -31,6 +31,11 @@ def _randomize_new_occults(_connection=None):
     output = sims4.commands.CheatOutput(_connection)
     occult_service.randomize_occults(output)
 
+@sims4.commands.Command('cleanup_hybrids', command_type=sims4.commands.CommandType.Live)
+def _cleanup_hybrids(_connection=None):
+    output = sims4.commands.CheatOutput(_connection)
+    occult_service.cleanup_hybrids(output)
+
 @sims4.commands.Command('jira.help', command_type=sims4.commands.CommandType.Cheat)
 def _jira_help(_connection=None):
     output = sims4.commands.CheatOutput(_connection)

@@ -28,3 +28,22 @@ def randomize_occults(output_func):
                 if OCCULT_TRAITS[choice_name] == Constants.FAIRY:
                     sim_info.add_trait(trait_manager.get(Constants.FAIRY_FYAE))
                 output_func(f"Converted {sim_info.first_name} to {choice_name}")
+
+
+
+def cleanup_hybrids(output_func):
+    trait_manager = services.get_instance_manager(Types.TRAIT)
+    all_sims = services.sim_info_manager().get_all()
+    
+    for sim_info in all_sims:
+        occults = []
+        for tid in OCCULT_TRAITS.values():
+            if trait_manager.get(tid) and sim_info.has_trait(trait_manager.get(tid)):
+                occults.append(trait_manager.get(tid))
+        
+        if len(occults) > 1:
+            output_func(f"{sim_info.first_name} {sim_info.last_name} has {len(occults)} occults")
+            occults.pop()
+            for occult in occults:
+                sim_info.remove_trait(occult)
+            output_func(f"Cleaned {sim_info.first_name} {sim_info.first_name}")
