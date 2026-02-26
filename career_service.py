@@ -1,6 +1,7 @@
 import services # type: ignore
 from sims4.resources import Types # type: ignore
 from tuning_ids import Constants
+import random
 
 def add_noble_career_to_sim(last_name: str, output_func):
     search_last = last_name.strip().lower()
@@ -59,7 +60,8 @@ def promote_noble_dynasty(output_func):
 
             if not career_instance is None:
                 promotions_given = 0
-                for _ in range(5):
+                noOfPromotions = random.randint(0, 10)
+                for _ in range(noOfPromotions):
                     career_instance.promote()
                     promotions_given += 1
                 

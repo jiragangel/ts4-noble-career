@@ -3,6 +3,7 @@ from sims.sim_info_types import Gender # type: ignore
 import random
 from datetime import datetime
 
+exempted_surnames = ['Everhart', 'Crowmoor', 'Beaumont', 'Salvatore', 'Triton']
 # 2. Name Lists
 female_names = [
     "Ava","Olivia","Emma","Charlotte","Amelia","Sophia","Isabella","Mia","Evelyn","Harper",
@@ -50,24 +51,26 @@ male_names = [
 
 
 surnames = [
-"Montgomery","Harrington","Wellington","Ashford","Kensington","Sinclair","Fairfax","Whitmore","Langston","Beaumont",
-"Blackwood","Rutherford","Kingsley","Pembroke","Westminster","Hollingsworth","Huntington","Chatsworth","Cavendish","Winthrop",
-"Rockefeller","Livingston","Hawthorne","Sterling","Huxley","Ellington","Prescott","Holloway","Barrington","Worthington",
-"Remington","Thornbridge","Ainsworth","Carnegie","Vanderbilt","Lockwood","Fitzroy","Haversham","Lancaster","Bellingham",
-"Middleton","Northington","Templeton","Loxley","Briarwood","Redgrave","Snowdon","Arlington","Whitfield","Kingsbridge",
-"Goldsworth","Pembury","Dunham","Marbury","Clayborne","Hendrixon","Everton","Bellamy","Grantham","Marlowe",
-"Westbrook","Summerton","Stratford","Rosewood","Kingsmoor","Brighton","Tennyson","Huntingford","Bridgerton","Kingsford",
-"Stonebridge","Winterton","Mayfair","Belmont","Ashcroft","Thornton","Chadwick","Delafield","Gloucester","Rivington",
-"Kingswell","Montague","Sherwood","Hampstead","Broadmoor","Fleetwood","Foxworth","Pemberton","Willoughby","Courtland",
-"Brookfield","Cromwell","Kingsport","Albright","Hadleigh","Brunswick","Whitestone","Farringdon","Eastwood","Stirling",
-"Kingsbury","Holliday","Blakemore","Manningham","Norwood","Greenwich","Parkhurst","Wentworth","Waverly","Bancroft",
-"Radcliffe","Hargrave","Kingshall","Tolliver","Westfield","Beckwith","Harriman","Longfellow","Wakefield","Fairbourne",
-"Kingsmont","Hampton","Strathmore","Golding","Ravenswood","Northfield","Bridgewater","Southwick","Kingsworth","Painswick",
-"Aberdeen","Cedarwood","Kingsland","Kingsport","Brightwell","Merrifield","Hartwell","Windsor","Cranbrook","Hathersage",
-"Kingsmere","Oakwood","Rothwell","Chilton","Whitcombe","Barclay","Hillsborough","Kingsfall","Northmoor","Fairmont",
-"Windermere","Snowfield","Lockhart","Ashbourne","Winterbourne","Clearwater","Highfield","Kingsridge","Glenwood","Kingsvale",
-"Foxbury","Harrowgate","Stonehurst","Westvale","Kingshaven","Brightmere","Rosemont","Silverstone","Kingscrest","Hedington",
-"Amberton","Northvale","Bramwell","Kingswatch","Oakridge","Haverford","Brookstone","Kingslake","Whitlock","Kingscourt"
+"Smith","Johnson","Brown","Jones","Taylor","Williams","Davis","Miller","Wilson","Moore",
+"Anderson","Thompson","Harris","Clark","Lewis","Walker","Hall","Young","Allen","King",
+"Wright","Scott","Green","Baker","Adams","Nelson","Hill","Campbell","Mitchell","Roberts",
+
+"Geller","Green","Bing","Tribbiani","Buffay","Cooper","Hofstadter","Wolowitz","Schrute","Halpert",
+"Scott","Malone","Hudson","Pearson","Salinger","Gilmore","Lorelai","Carrington","Colby","Forrester",
+"Logan","Roy","Pierce","Hunt","Grey","Shepherd","Yang","Montgomery","Crane","Addams",
+"Bates","Corleone","Soprano","Capone","Montague","Capulet","White","Pinkman","Fring","McGill",
+"Goodman","Schrader","Delgado","Reyes","Diaz","Torres","Garcia","Morales","Vega","Castillo",
+
+"Shelby","Byers","Hopper","Wheeler","Sinclair","Cooper","Lodge","Andrews","Keller","Hargreeves",
+"Grimes","Dixon","Rhee","Stinson","Mosby","Eriksen","Aldrin","Donovan","Prescott","Harrington",
+
+"Bluth","Seinfeld","Costanza","Kramer","Newman","Draper","Sterling","Campbell","Olson","Francis",
+"Underwood","Walker","Dunphy","Pritchett","Tucker","Delgado","Diaz","Ramirez","Gutierrez","Navarro",
+
+"Bridgerton","Featherington","Crane","Bennett","Darcy","Collins","Elliot","Knightley","Weston","Fairfax",
+"Woodhouse","Thornton","Crawley","Carson","Hughes","Bates","Barrow","Branson","Grantham","Talbot",
+
+"Presley","Monroe","Kennedy","Nixon","Reagan","Clinton","Bush","Obama","Washington","Lincoln"
 ]
 
 def update_all_household_funds(amount: int, output_func):
@@ -176,6 +179,9 @@ def randomize_townie_unmarried(output):
                 break
 
             if sim_info.household_id == active_household_id:
+                continue
+
+            if sim_info.last_name in exempted_surnames:
                 continue
 
             try:

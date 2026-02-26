@@ -55,5 +55,5 @@ def _randomize_townie_marriage_names(_connection=None):
     household_service.randomize_townie_marriage_names(sims4.commands.CheatOutput(_connection))
 
 @sims4.commands.Command('rename_unmarried_sims', command_type=sims4.commands.CommandType.Live)
-def _randomize_townie_marriage_names(_connection=None):
+def _rename_unmarried_sims(_connection=None):
     household_service.randomize_townie_unmarried(sims4.commands.CheatOutput(_connection))
