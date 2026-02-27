@@ -5,6 +5,7 @@ import career_service
 import social_service
 import household_service
 import occult_service
+import town_service
 
 @sims4.commands.Command('increase_celebrity_by_lastname', command_type=sims4.commands.CommandType.Live)
 def _increase_celebrity_by_lastname(last_name: str = '',  fame_points: int = 1000, _connection=None):
@@ -62,3 +63,7 @@ def _randomize_townie_marriage_names(_connection=None):
 @sims4.commands.Command('rename_unmarried_sims', command_type=sims4.commands.CommandType.Live)
 def _rename_unmarried_sims(_connection=None):
     household_service.randomize_townie_unmarried(sims4.commands.CheatOutput(_connection))
+
+@sims4.commands.Command('town', command_type=sims4.commands.CommandType.Live)
+def _town(_connection=None):
+    town_service.safe_iterate_town_households(sims4.commands.CheatOutput(_connection))
