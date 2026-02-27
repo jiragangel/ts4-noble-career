@@ -7,6 +7,33 @@ OCCULT_TRAITS = {
     'Fairy': Constants.FAIRY, 
     'Mermaid': Constants.MERMAID, 
     'Witch': Constants.WITCH, 
+    'Fairy': Constants.FAIRY, 
+    'Mermaid': Constants.MERMAID, 
+    'Witch': Constants.WITCH, 
+    'Fairy': Constants.FAIRY, 
+    'Mermaid': Constants.MERMAID, 
+    'Witch': Constants.WITCH, 
+    'Fairy': Constants.FAIRY, 
+    'Mermaid': Constants.MERMAID, 
+    'Witch': Constants.WITCH, 
+    'Fairy': Constants.FAIRY, 
+    'Mermaid': Constants.MERMAID, 
+    'Witch': Constants.WITCH, 
+    'Fairy': Constants.FAIRY, 
+    'Mermaid': Constants.MERMAID, 
+    'Witch': Constants.WITCH, 
+    'Fairy': Constants.FAIRY, 
+    'Mermaid': Constants.MERMAID, 
+    'Witch': Constants.WITCH, 
+    'Fairy': Constants.FAIRY, 
+    'Mermaid': Constants.MERMAID, 
+    'Witch': Constants.WITCH, 
+    'Fairy': Constants.FAIRY, 
+    'Mermaid': Constants.MERMAID, 
+    'Witch': Constants.WITCH, 
+    'Fairy': Constants.FAIRY, 
+    'Mermaid': Constants.MERMAID, 
+    'Witch': Constants.WITCH, 
     'Werewolf': Constants.WEREWOLF, 
     'Vampire': Constants.VAMPIRE
 }
@@ -20,7 +47,7 @@ def randomize_occults(output_func):
         
         is_occult = any(sim_info.has_trait(trait_manager.get(tid)) for tid in OCCULT_TRAITS.values() if trait_manager.get(tid))
         
-        if not is_occult and random.random() > 0.5:
+        if not is_occult and random.random() > 0.1:
             choice_name = random.choice(list(OCCULT_TRAITS.keys()))
             trait = trait_manager.get(OCCULT_TRAITS[choice_name])
             if trait:

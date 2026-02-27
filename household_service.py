@@ -1,77 +1,9 @@
 import services # type: ignore
 from sims.sim_info_types import Gender # type: ignore
 import random
-from datetime import datetime
+from lists import male_names, female_names, surnames
 
 exempted_surnames = ['Everhart', 'Crowmoor', 'Beaumont', 'Salvatore', 'Triton']
-# 2. Name Lists
-female_names = [
-    "Ava","Olivia","Emma","Charlotte","Amelia","Sophia","Isabella","Mia","Evelyn","Harper",
-    "Luna","Ella","Abigail","Emily","Elizabeth","Sofia","Avery","Scarlett","Grace","Chloe",
-    "Victoria","Riley","Aria","Lily","Aubrey","Zoey","Penelope","Lillian","Addison","Layla",
-    "Natalie","Camila","Hannah","Brooklyn","Zoe","Nora","Leah","Savannah","Audrey","Claire",
-    "Eleanor","Skylar","Ellie","Samantha","Stella","Paisley","Violet","Mila","Allison","Alexa",
-    "Lucy","Madelyn","Bella","Julia","Piper","Hailey","Kinsley","Sadie","Autumn","Naomi",
-    "Caroline","Genesis","Kennedy","Serenity","Maya","Sarah","Eva","Ariana","Quinn","Lydia",
-    "Jade","Brianna","Adeline","Vivian","Willow","Reagan","Faith","Rose","Melanie","Eliza",
-    "Isabelle","Valerie","Margaret","Ivy","Trinity","Emilia","Delilah","Josie","Ruby","Kaylee",
-    "Taylor","Lyla","Katherine","Alexis","London","Payton","Brielle","Clara","Hadley","Eden",
-    "Madeline","Alyssa","Nova","Isla","Nevaeh","Sloane","Elena","Kehlani","Blair","Mackenzie",
-    "Juliana","Finley","Ariel","Phoebe","Daisy","Joanna","Tessa","Genevieve","Molly","Summer",
-    "Nicole","Cecilia","Brooke","Lila","Ruth","Hope","Fiona","Annabelle","Jordyn","Noelle",
-    "Rebecca","Bailey","Marley","Georgia","Alana","June","Kimberly","Veronica","Diana","Sabrina",
-    "Angelina","Miranda","Rosalie","Helena","Annie","Paige","Shiloh","Teagan","Hallie","Rowan",
-    "Zara","Emery","Aspen","Blake","Kaitlyn","Lola","Sienna","Margot","Willa","Peyton",
-    "Lauren","Bethany","Delaney","Kara","Talia","Megan","Leslie","Cassidy","Danielle","Bryn",
-    "Selena","Sage","Renee","Jenna","Ainsley","Lennon","Kelsey","Harley","Tatum","Oakley"
-]
-
-
-male_names = [
-    "Liam","Noah","Oliver","Elijah","James","William","Benjamin","Lucas","Henry","Theodore",
-    "Jack","Levi","Alexander","Jackson","Mateo","Daniel","Michael","Mason","Sebastian","Ethan",
-    "Logan","Owen","Samuel","Jacob","Asher","Aiden","John","Joseph","Wyatt","David",
-    "Leo","Luke","Julian","Hudson","Grayson","Matthew","Ezra","Gabriel","Carter","Isaac",
-    "Jayden","Luca","Anthony","Dylan","Lincoln","Thomas","Maverick","Elias","Josiah","Charles",
-    "Caleb","Christopher","Ezekiel","Miles","Jaxon","Isaiah","Andrew","Joshua","Nathan","Nolan",
-    "Adrian","Cameron","Eli","Aaron","Ryan","Angel","Cooper","Waylon","Easton","Kai",
-    "Christian","Landon","Colton","Roman","Axel","Brooks","Jonathan","Robert","Jameson","Ian",
-    "Everett","Greyson","Wesley","Hunter","Leonardo","Bennett","Silas","Micah","Parker","Weston",
-    "Brayden","Jordan","Jeremiah","Gavin","Nicholas","Austin","Adam","Evan","Dominic","Jose",
-    "Jace","Julio","Kevin","Brandon","Tyler","Zachary","Eric","Connor","Diego","Calvin",
-    "Antonio","Justin","Steven","Ayden","Jesse","Miguel","Vincent","Patrick","Kyle","Colin",
-    "Marcus","Damian","Joel","Max","Jeremy","George","Emmanuel","Trevor","Riley","Victor",
-    "Bryce","Luis","Jared","Grant","Oscar","Malachi","Xavier","Timothy","Emilio","Paul",
-    "Brady","Colt","Alan","Brody","Derek","Jude","Peter","Tucker","Avery","Blake",
-    "Rafael","Brent","Scott","Spencer","Mitchell","Dean","Hayden","Shawn","Travis","Marshall",
-    "Jasper","Rowan","Sawyer","Finn","Holden","Reed","Cole","Ellis","Beckett","Arthur",
-    "Simon","Theo","Sterling","Zane","Preston","Harrison","Clayton","Warren","Graham","Bryan",
-    "Corey","Dustin","Franklin","Garrett","Howard","Russell","Troy","Victor-James","Wallace","Wade"
-]
-
-
-surnames = [
-"Smith","Johnson","Brown","Jones","Taylor","Williams","Davis","Miller","Wilson","Moore",
-"Anderson","Thompson","Harris","Clark","Lewis","Walker","Hall","Young","Allen","King",
-"Wright","Scott","Green","Baker","Adams","Nelson","Hill","Campbell","Mitchell","Roberts",
-
-"Geller","Green","Bing","Tribbiani","Buffay","Cooper","Hofstadter","Wolowitz","Schrute","Halpert",
-"Scott","Malone","Hudson","Pearson","Salinger","Gilmore","Lorelai","Carrington","Colby","Forrester",
-"Logan","Roy","Pierce","Hunt","Grey","Shepherd","Yang","Montgomery","Crane","Addams",
-"Bates","Corleone","Soprano","Capone","Montague","Capulet","White","Pinkman","Fring","McGill",
-"Goodman","Schrader","Delgado","Reyes","Diaz","Torres","Garcia","Morales","Vega","Castillo",
-
-"Shelby","Byers","Hopper","Wheeler","Sinclair","Cooper","Lodge","Andrews","Keller","Hargreeves",
-"Grimes","Dixon","Rhee","Stinson","Mosby","Eriksen","Aldrin","Donovan","Prescott","Harrington",
-
-"Bluth","Seinfeld","Costanza","Kramer","Newman","Draper","Sterling","Campbell","Olson","Francis",
-"Underwood","Walker","Dunphy","Pritchett","Tucker","Delgado","Diaz","Ramirez","Gutierrez","Navarro",
-
-"Bridgerton","Featherington","Crane","Bennett","Darcy","Collins","Elliot","Knightley","Weston","Fairfax",
-"Woodhouse","Thornton","Crawley","Carson","Hughes","Bates","Barrow","Branson","Grantham","Talbot",
-
-"Presley","Monroe","Kennedy","Nixon","Reagan","Clinton","Bush","Obama","Washington","Lincoln"
-]
 
 def update_all_household_funds(amount: int, output_func):
     household_manager = services.household_manager()
@@ -196,7 +128,7 @@ def randomize_townie_unmarried(output):
                 
                 new_firstname = ''
                 
-                if sim_info.gender != Gender.FEMALE:
+                if sim_info.gender == Gender.FEMALE:
                     new_firstname = random.choice(female_names)
                 else:
                     new_firstname = random.choice(male_names)
