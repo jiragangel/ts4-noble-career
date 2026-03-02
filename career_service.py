@@ -21,14 +21,14 @@ def add_random_career(output_func):
                 sim_info.career_tracker.add_career(new_career_instance)
                 output_func(f"Added career to {sim_info.first_name} {sim_info.last_name}")
 
-def add_noble_career_to_sim(last_name: str, output_func):
-    search_last = last_name.strip().lower()
+def add_noble_career_to_sim(full_name: str, output_func):
+    search_full_name = full_name.strip().lower()
     noble_career_id = Constants.NOBLE
     instance_manager = services.get_instance_manager(Types.CAREER)
     noble_career_tuning = instance_manager.get(noble_career_id)
 
     for sim_info in services.sim_info_manager().get_all():
-        if (sim_info.last_name.lower() == search_last and sim_info.is_teen_or_older) or (not last_name and sim_info.is_teen_or_older):
+        if (search_full_name in f"{sim_info.first_name.lower()} {sim_info.last_name.lower()}" and sim_info.is_teen_or_older) or (not search_full_name and sim_info.is_teen_or_older):
             # Instantiate and add career
             new_career_instance = noble_career_tuning(sim_info)
             sim_info.career_tracker.add_career(new_career_instance)
