@@ -14,3 +14,4 @@ class Constants:
     BUSINESS = 106460
     CULINARY = 9231
     ENTERTAINER = 27929
+    ALIEN = 102785

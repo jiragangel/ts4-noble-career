@@ -38,6 +38,16 @@ OCCULT_TRAITS = {
     'Vampire': Constants.VAMPIRE
 }
 
+def remove_aliens(output):
+    trait_manager = services.get_instance_manager(Types.TRAIT)
+    all_sims = services.sim_info_manager().get_all()
+    
+    for sim_info in all_sims:
+        alien_trait = trait_manager.get(Constants.ALIEN)
+        if sim_info.has_trait(alien_trait):
+            sim_info.remove_trait(alien_trait)
+            output(f"Cleaned {sim_info.first_name} {sim_info.last_name}")
+
 def randomize_occults(output_func):
     trait_manager = services.get_instance_manager(Types.TRAIT)
     all_sims = services.sim_info_manager().get_all()
@@ -73,4 +83,4 @@ def cleanup_hybrids(output_func):
             occults.pop()
             for occult in occults:
                 sim_info.remove_trait(occult)
-            output_func(f"Cleaned {sim_info.first_name} {sim_info.first_name}")
+            output_func(f"Cleaned {sim_info.first_name} {sim_info.last_name}")
