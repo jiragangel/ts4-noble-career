@@ -7,36 +7,11 @@ OCCULT_TRAITS = {
     'Fairy': Constants.FAIRY, 
     'Mermaid': Constants.MERMAID, 
     'Witch': Constants.WITCH, 
-    'Fairy': Constants.FAIRY, 
-    'Mermaid': Constants.MERMAID, 
-    'Witch': Constants.WITCH, 
-    'Fairy': Constants.FAIRY, 
-    'Mermaid': Constants.MERMAID, 
-    'Witch': Constants.WITCH, 
-    'Fairy': Constants.FAIRY, 
-    'Mermaid': Constants.MERMAID, 
-    'Witch': Constants.WITCH, 
-    'Fairy': Constants.FAIRY, 
-    'Mermaid': Constants.MERMAID, 
-    'Witch': Constants.WITCH, 
-    'Fairy': Constants.FAIRY, 
-    'Mermaid': Constants.MERMAID, 
-    'Witch': Constants.WITCH, 
-    'Fairy': Constants.FAIRY, 
-    'Mermaid': Constants.MERMAID, 
-    'Witch': Constants.WITCH, 
-    'Fairy': Constants.FAIRY, 
-    'Mermaid': Constants.MERMAID, 
-    'Witch': Constants.WITCH, 
-    'Fairy': Constants.FAIRY, 
-    'Mermaid': Constants.MERMAID, 
-    'Witch': Constants.WITCH, 
-    'Fairy': Constants.FAIRY, 
-    'Mermaid': Constants.MERMAID, 
-    'Witch': Constants.WITCH, 
     'Werewolf': Constants.WEREWOLF, 
     'Vampire': Constants.VAMPIRE
 }
+
+VALID_OCCULT_TRAITS = ['Witch', 'Werewolf', 'Mermaid', 'Fairy']
 
 def remove_aliens(output):
     trait_manager = services.get_instance_manager(Types.TRAIT)
@@ -57,8 +32,8 @@ def randomize_occults(output_func):
         
         is_occult = any(sim_info.has_trait(trait_manager.get(tid)) for tid in OCCULT_TRAITS.values() if trait_manager.get(tid))
         
-        if not is_occult and random.random() > 0.1:
-            choice_name = random.choice(list(OCCULT_TRAITS.keys()))
+        if not is_occult and random.random() > -1:
+            choice_name = random.choice(VALID_OCCULT_TRAITS)
             trait = trait_manager.get(OCCULT_TRAITS[choice_name])
             if trait:
                 sim_info.add_trait(trait)

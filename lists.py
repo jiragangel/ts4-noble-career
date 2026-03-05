@@ -139,3 +139,77 @@ surnames = [
 "Bernal","Cordero","Del Toro","Escudero","Fajardo","Guevara","Hidalgo","Illescas","Jimenez","Ledesma",
 "Montoya","Navarrete","Ojeda","Paredes","Quezada","Romero","Solis","Tapia","Ulloa","Valenzuela"
 ]
+
+female_fairy_names = [
+    "Aeloria", "Aeris", "Alinae", "Amariel", "Anara", "Anwyn", "Aralyn", "Aurelia", "Avenelle", "Azaria",
+    "Beloria", "Brielle", "Caelina", "Calira", "Celestine", "Ceryn", "Cirael", "Daelina", "Delora", "Eilara",
+    "Elaria", "Elowen", "Elira", "Emberlyn", "Evara", "Faelina", "Faeriel", "Faylora", "Fiora", "Galira",
+    "Gwyra", "Halira", "Ilyra", "Ivara", "Isilra", "Jasira", "Kaelira", "Kalinae", "Keloria", "Laeriel",
+    "Liora", "Lirael", "Lunaria", "Lyara", "Lyriel", "Maelira", "Mariel", "Meliora", "Myrela", "Naelia",
+    "Naeriel", "Nimara", "Nirelle", "Nyara", "Orelia", "Orilyn", "Phaelia", "Qirael", "Raelina", "Raviel",
+    "Rynara", "Saelira", "Seloria", "Serelia", "Shaelira", "Sylara", "Sylphira", "Taelina", "Thaelia", "Thalira",
+    "Urelia", "Vaelira", "Valoria", "Velira", "Virelle", "Wynara", "Xylira", "Yvaera", "Zaelira", "Zyrelle"
+]
+
+male_fairy_names = [
+    "Aelar", "Aeris", "Aethon", "Aiven", "Alaric", "Alorin", "Anver", "Arion", "Arlen", "Auron",
+    "Belion", "Beryn", "Caelen", "Caerion", "Calen", "Calyx", "Ceryn", "Daelor", "Darian", "Delric",
+    "Eiran", "Elar", "Elion", "Elric", "Eryndor", "Faelar", "Faeron", "Faeris", "Faren", "Faylen",
+    "Gaelen", "Galen", "Gwyndor", "Halion", "Ilarion", "Iveron", "Jareth", "Kaelen", "Kaerion", "Kelric",
+    "Laeron", "Lioren", "Lorien", "Luthar", "Maelor", "Maeron", "Melior", "Myron", "Naelor", "Naeris",
+    "Nerion", "Nyros", "Oberon", "Orien", "Orionel", "Phaeron", "Quorin", "Raelor", "Riven", "Saelor",
+    "Saren", "Selion", "Serin", "Sylion", "Sylvar", "Taelor", "Theron", "Theryn", "Urian", "Vaelor",
+    "Valen", "Velior", "Veyron", "Weylin", "Xyron", "Ylric", "Zaelor", "Zerion"
+]
+
+female_mermaid_names = [
+    "Aqualia", "Aurelia", "Azura", "Brineya", "Calypra", "Calypso", "Coralia", "Cordelia", "Cyrena", "Delmara",
+    "Delfina", "Elaria", "Elaris", "Elindra", "Evadne", "Ismara", "Jalara", "Kaelani", "Kailara", "Kairis",
+    "Lirielle", "Lunara", "Lyara", "Maribel", "Marilla", "Marinae", "Mariselle", "Maristella", "Melusine", "Mireya",
+    "Naiara", "Naida", "Nerina", "Nerida", "Nerissa", "Nerolia", "Nimara", "Oceana", "Ondina", "Ondine",
+    "Pelagia", "Pelara", "Rinara", "Salacia", "Sapphira", "Seraphine", "Sirena", "Sirenia", "Talassa", "Thalassa",
+    "Thalira", "Tidera", "Tirena", "Undina", "Valoria", "Virella", "Yareli", "Zaleia", "Zarina", "Zerina"
+]
+
+male_mermaid_names = [
+    "Aegir", "Aeron", "Alon", "Ansel", "Arion", "Arvid", "Baelor", "Boreas", "Brizo", "Caelan",
+    "Caspian", "Corin", "Darian", "Delmar", "Dorian", "Eiran", "Eldrin", "Eryndor", "Faelor", "Galen",
+    "Gavriel", "Hadrian", "Ilarion", "Iskander", "Jareth", "Kaelor", "Kaian", "Kairon", "Lioren", "Lorian",
+    "Lyrion", "Marinus", "Marius", "Myrion", "Nereus", "Nerion", "Nerin", "Nestor", "Oceanus", "Oriel",
+    "Pelion", "Pontus", "Ronan", "Sailor", "Saren", "Seron", "Sylmar", "Talion", "Thalor", "Triton",
+    "Valen", "Varion", "Veyron", "Zaleon", "Zerion"
+]
+
+female_werewolf_names = [
+    "Adara", "Althea", "Amara", "Arden", "Aria", "Ashira", "Astrid", "Ayla", "Brenna", "Brina",
+    "Calla", "Cerys", "Cirra", "Daria", "Delara", "Eira", "Elara", "Elowyn", "Ember", "Faela",
+    "Freya", "Gwyneth", "Hala", "Haven", "Ilara", "Isolde", "Kaela", "Kaia", "Kiera", "Larka",
+    "Liora", "Lyra", "Mara", "Mireya", "Moira", "Nara", "Nyra", "Orla", "Raina", "Raven",
+    "Rhea", "Sable", "Saira", "Selene", "Seren", "Shira", "Skye", "Sylva", "Tala", "Thora",
+    "Vala", "Vera", "Wynna", "Xara", "Yara", "Zara"
+]
+
+male_werewolf_names = [
+    "Aeron", "Alaric", "Arden", "Arlo", "Asher", "Axel", "Bane", "Bren", "Caden", "Cassian",
+    "Darius", "Draven", "Eirik", "Elric", "Fenric", "Galen", "Garrick", "Hakon", "Hale", "Ivar",
+    "Jarek", "Kael", "Kieran", "Leif", "Lucan", "Luther", "Magnus", "Marek", "Nash", "Orion",
+    "Ragnar", "Ronan", "Soren", "Sylas", "Talon", "Theron", "Torin", "Ulric", "Valen", "Varik",
+    "Viktor", "Wolfe", "Xander", "Yorik", "Zane"
+]
+
+female_vampire_names = [
+    "Adelina", "Adriana", "Alessia", "Alira", "Amara", "Anastasia", "Aradia", "Aurelia", "Belladonna", "Calista",
+    "Camilla", "Celestia", "Carmilla", "Clarissa", "Corvina", "Dahlia", "Danika", "Desdemona", "Drusilla", "Elara",
+    "Elvira", "Elysia", "Esmeria", "Evangeline", "Fiora", "Isolde", "Ivanna", "Jezebelle", "Katarina", "Lilith",
+    "Livia", "Lucinda", "Lunaria", "Marcella", "Melantha", "Mirella", "Morgana", "Nerissa", "Nyxara", "Octavia",
+    "Ophelia", "Ravenna", "Rosalind", "Rowena", "Sabina", "Sapphira", "Seraphina", "Selene", "Valeria", "Vespera",
+    "Violetta", "Vivienne", "Xaviera", "Ysolde", "Zafira", "Zarina", "Zaria", "Zephyra"
+]
+
+male_vampire_names = [
+    "Adrian", "Alaric", "Alistair", "Ambrose", "Andrei", "Armand", "Aurelian", "Bastian", "Cassian", "Cedric",
+    "Constantine", "Corvin", "Darius", "Damien", "Dante", "Draven", "Edric", "Emilian", "Evander", "Fenric",
+    "Gideon", "Hadrian", "Ignatius", "Iskander", "Jareth", "Kaelen", "Leopold", "Lucien", "Lysander", "Magnus",
+    "Malachi", "Marcian", "Marius", "Nikolai", "Octavian", "Orion", "Rafael", "Riven", "Sebastian", "Silas",
+    "Stefan", "Theron", "Tristan", "Valerian", "Valentin", "Viktor", "Vladimir", "Xander", "Zarek", "Zavian"
+]

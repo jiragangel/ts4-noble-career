@@ -1,8 +1,10 @@
 import services # type: ignore
 from sims.sim_info_types import Gender # type: ignore
 import random
-from lists import male_names, female_names, surnames
+from lists import male_names, female_names, surnames, female_fairy_names, male_fairy_names, female_mermaid_names, male_mermaid_names, female_werewolf_names, male_werewolf_names, female_vampire_names, male_vampire_names
+from tuning_ids import Constants
 from utils import get_children_of_sim
+from sims4.resources import Types # type: ignore
 
 exempted_surnames = ['Everhart', 'Crowmoor', 'Beaumont', 'Salvatore', 'Triton']
 
@@ -35,6 +37,39 @@ def get_spouse_info_by_id(sim_id):
         return sim_info_manager.get(spouse_id)
     
     return None
+
+def get_name(sim_info):
+    trait_manager = services.get_instance_manager(Types.TRAIT)
+    
+    if sim_info.has_trait(trait_manager.get(Constants.FAIRY)):
+        if sim_info.gender == Gender.FEMALE:
+            return random.choice(female_fairy_names)
+        else:
+            return random.choice(male_fairy_names)
+    
+    if sim_info.has_trait(trait_manager.get(Constants.MERMAID)):
+        if sim_info.gender == Gender.FEMALE:
+            return random.choice(female_mermaid_names)
+        else:
+            return random.choice(male_mermaid_names)
+    
+    if sim_info.has_trait(trait_manager.get(Constants.WEREWOLF)):
+        if sim_info.gender == Gender.FEMALE:
+            return random.choice(female_werewolf_names)
+        else:
+            return random.choice(male_werewolf_names)
+    
+    if sim_info.has_trait(trait_manager.get(Constants.VAMPIRE)):
+        if sim_info.gender == Gender.FEMALE:
+            return random.choice(female_vampire_names)
+        else:
+            return random.choice(male_vampire_names)
+        
+    if sim_info.gender == Gender.FEMALE:
+        return random.choice(female_names)
+    else:
+        return random.choice(male_names)
+
 
 def randomize_townie_marriage_names(output):
     try:
@@ -71,9 +106,9 @@ def randomize_townie_marriage_names(output):
 
                     old_names = f"{sim_info.first_name} {sim_info.last_name} & {spouse_info.first_name} {spouse_info.last_name}"
                     
-                    sim_info.first_name = new_female_fn
+                    sim_info.first_name = get_name(sim_info)
                     sim_info.last_name = new_surname
-                    spouse_info.first_name = new_male_fn
+                    spouse_info.first_name = get_name(spouse_info)
                     spouse_info.last_name = new_surname
                     
                     processed_sim_ids.add(sim_info.sim_id)
@@ -92,10 +127,7 @@ def randomize_townie_marriage_names(output):
                         
                         if not child_spouse_info:
                             child.last_name = new_surname
-                            if child.gender == Gender.FEMALE:
-                                child.first_name = random.choice(female_names)
-                            else:
-                                child.first_name = random.choice(male_names)
+                            child.first_name = get_name(child)
                     
                     log_msg = f"SUCCESS: {new_surname} family"
                     output(log_msg)
