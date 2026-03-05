@@ -45,10 +45,12 @@ def getNobleCareerInstance(sim_info, output_func):
         return None
 
     for career_instance in tracker.careers.values():
+        output_func(f"career_instance: {career_instance}")
         if isinstance(career_instance, Career_noble):
             output_func(f"Processing Noble: {sim_info.first_name} {sim_info.last_name}")
             return career_instance
     
+    output_func(f"Not Noble: {sim_info.first_name} {sim_info.last_name}")
     return None
 
 
@@ -69,16 +71,12 @@ def promote_noble_dynasty(output_func):
         if not sim_info.is_teen_or_older:
             continue
 
-        tracker = sim_info.career_tracker
-        if tracker is None:
-            continue
-
         try:
             career_instance = getNobleCareerInstance(sim_info, output_func)
 
             if not career_instance is None:
                 promotions_given = 0
-                noOfPromotions = random.randint(0, 10)
+                noOfPromotions = random.randint(0, 5)
                 for _ in range(noOfPromotions):
                     career_instance.promote()
                     promotions_given += 1

@@ -2,6 +2,7 @@ from career_service import getNobleCareerInstance
 import services  # type: ignore
 import traceback
 from sims4.resources import Types # type: ignore
+from sims.sim_info_types import Species # type: ignore
 
 from tuning_ids import Constants
 
@@ -38,13 +39,10 @@ def safe_iterate_town_households(output):
 
                         # Retrieve SimInfo by ID
                         sim_info = sim_info_manager.get(sim_id)
-                        if sim_info.is_teen_or_older:
+                        if sim_info.is_teen_or_older and sim_info.species == Species.HUMAN:
                             career_instance = getNobleCareerInstance(sim_info, output)
 
-                            if not career_instance is None:
-                                for _ in range(10):
-                                    career_instance.promote()
-                            else:
+                            if career_instance is None:
                                 instance_manager = services.get_instance_manager(Types.CAREER)
                                 noble_career_tuning = instance_manager.get(Constants.NOBLE)
                                 sim_info.career_tracker.add_career(noble_career_tuning(sim_info))

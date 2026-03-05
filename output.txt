@@ -1,0 +1,177 @@
+Starting Town/Household Iteration...
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+3428213867
+<class 'sims4.tuning.instances.region_Residential_CityLife'>
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Fairfax
+0
+0
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Hawk
+3986516868
+<class 'sims4.tuning.instances.region_Residential_EP18World'>
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+0
+0
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Lerman
+1420552844
+<class 'sims4.tuning.instances.region_Residential_FameWorld'>
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+2208554671
+<class 'sims4.tuning.instances.region_Residential_EP17World'>
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Wallace
+2697210009
+<class 'sims4.tuning.instances.region_Residential_EP21World'>
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Robinson
+1549761885
+<class 'sims4.tuning.instances.region_Residential_IslandWorld'>
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Howard
+2280805822
+<class 'sims4.tuning.instances.region_Residential_WillowCreek'>
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Manning
+100140133
+<class 'sims4.tuning.instances.region_Residential_Magic'>
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Lloyd
+3442073656
+<class 'sims4.tuning.instances.region_Residential_WeddingWorld'>
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Donovan
+3950992577
+<class 'sims4.tuning.instances.region_Residential_VampireWorld'>
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Ochoa
+1893347376
+<class 'sims4.tuning.instances.region_Residential_IslandWorld'>
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Zarate
+2323227531
+<class 'sims4.tuning.instances.region_Residential_FameWorld'>
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Acevedo
+3950992577
+<class 'sims4.tuning.instances.region_Residential_VampireWorld'>
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Powell
+3632553424
+<class 'sims4.tuning.instances.region_Residential_OasisSprings'>
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Escudero
+1152393529
+<class 'sims4.tuning.instances.region_Residential_EP20World'>
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+2371324614
+<class 'sims4.tuning.instances.region_Residential_UniversityWorld'>
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+1987342340
+<class 'sims4.tuning.instances.region_Residential_EP21World'>
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+2208554671
+<class 'sims4.tuning.instances.region_Residential_EP17World'>
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+711065386
+<class 'sims4.tuning.instances.region_Residential_OasisSprings'>
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Winters
+2474553381
+<class 'sims4.tuning.instances.region_Residential_WillowCreek'>
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Campos
+3345774934
+<class 'sims4.tuning.instances.region_Residential_EP19World'>
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Coleman
+2518223919
+<class 'sims4.tuning.instances.region_Residential_EP18World'>
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Somerhalder
+3013809927
+<class 'sims4.tuning.instances.region_Residential_HighSchoolWorld'>
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Weir
+2363457107
+<class 'sims4.tuning.instances.region_Residential_WillowCreek'>
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Delgadillo
+0
+0
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Somerhalder
+1812713502
+<class 'sims4.tuning.instances.region_Residential_WolfTown'>
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Norris
+2893613071
+<class 'sims4.tuning.instances.region_Residential_PetWorld'>
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Navas
+1505295608
+<class 'sims4.tuning.instances.region_Residential_HighSchoolWorld'>
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Kenyon
+0
+0
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+4034911840
+<class 'sims4.tuning.instances.region_Residential_CityLife'>
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Hoult
+369359163
+<class 'sims4.tuning.instances.region_Residential_EcoWorld'>
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+4017562985
+<class 'sims4.tuning.instances.region_Residential_MultiUnitWorld'>
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Lautner
+617967630
+<class 'sims4.tuning.instances.region_Residential_OasisSprings'>
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Tatum
+312126436
+<class 'sims4.tuning.instances.region_Residential_EP21World'>
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Morley
+4034911840
+<class 'sims4.tuning.instances.region_Residential_CityLife'>
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+2596862512
+<class 'sims4.tuning.instances.region_Residential_BayArea'>
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+James
+3632553424
+<class 'sims4.tuning.instances.region_Residential_OasisSprings'>
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+3962653297
+<class 'sims4.tuning.instances.region_Residential_BayArea'>
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+2496862430
+<class 'sims4.tuning.instances.region_Residential_EcoWorld'>
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+2371324614
+<class 'sims4.tuning.instances.region_Residential_UniversityWorld'>
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Tatum
+1491052508
+<class 'sims4.tuning.instances.region_Residential_MountainWorld'>
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Nixon
+2323227531
+<class 'sims4.tuning.instances.region_Residential_FameWorld'>
