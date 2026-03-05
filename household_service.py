@@ -2,6 +2,7 @@ import services # type: ignore
 from sims.sim_info_types import Gender # type: ignore
 import random
 from lists import male_names, female_names, surnames
+from utils import get_children_of_sim
 
 exempted_surnames = ['Everhart', 'Crowmoor', 'Beaumont', 'Salvatore', 'Triton']
 
@@ -80,6 +81,23 @@ def randomize_townie_marriage_names(output):
                     
                     count += 1
                     log_msg = f"SUCCESS: {old_names} -> {new_female_fn} & {new_male_fn} {new_surname}"
+                    output(log_msg)
+
+                    children_info = get_children_of_sim(sim_info)
+
+                    output(f"{new_surname} has {len(children_info)} kids")
+
+                    for child in children_info:
+                        child_spouse_info = get_spouse_info_by_id(child.sim_id)
+                        
+                        if not child_spouse_info:
+                            child.last_name = new_surname
+                            if child.gender == Gender.FEMALE:
+                                child.first_name = random.choice(female_names)
+                            else:
+                                child.first_name = random.choice(male_names)
+                    
+                    log_msg = f"SUCCESS: {new_surname} family"
                     output(log_msg)
 
             except Exception as e:
