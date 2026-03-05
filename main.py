@@ -6,6 +6,8 @@ import social_service
 import household_service
 import occult_service
 import town_service
+import services
+from utils import display_all_attributes # type: ignore
 
 @sims4.commands.Command('increase_celebrity_by_lastname', command_type=sims4.commands.CommandType.Live)
 def _increase_celebrity_by_lastname(last_name: str = '',  fame_points: int = 1000, _connection=None):
@@ -84,3 +86,8 @@ def _create_noble_per_town(_connection=None):
 @sims4.commands.Command('remove_aliens', command_type=sims4.commands.CommandType.Live)
 def _remove_aliens(_connection=None):
     occult_service.remove_aliens(sims4.commands.CheatOutput(_connection))
+
+@sims4.commands.Command('cleanup_kingdom_manager', command_type=sims4.commands.CommandType.Live)
+def _cleanup_kingdom_manager(_connection=None):
+    kingdom_manager = services.kingdom_service()
+    display_all_attributes(kingdom_manager)

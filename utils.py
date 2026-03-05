@@ -1,25 +1,40 @@
 import inspect
 import services # type: ignore
 
-def display_all_attributes(object, f):
+LOG_FILE_PATH = 'C:/Users/jiraa/Downloads/jira_mod/output.txt'
+
+def write_to_log(message):
+    """Simple helper to append lines to our custom text file."""
+    with open(LOG_FILE_PATH, 'a', encoding='utf-8') as f:
+        f.write(f"{message}\n")
+
+def display_all_attributes(object):
     all_members = inspect.getmembers(object)
 
     for name, value in all_members:
-        print(f"{name}: {value}", file=f)
+        write_to_log(f"~~~~~~~~~~~~~~~~~~~~~~~~~{name}~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
+        try:
+            sig = inspect.signature(value)
+
+            write_to_log("Parameter type hints:")
+
+            for name, parameter in sig.parameters.items():
+                if parameter.annotation is not inspect.Parameter.empty:
+                    write_to_log(f"* {name}: {parameter.annotation}")
+                else:
+                    write_to_log(f"* {name}: No type hint")
+
+        except Exception as e:
+            write_to_log(f"{name}: {value}")
 
 def get_full_name(sim_info):
     return f"{sim_info.first_name} {sim_info.last_name}"
 
 def get_children_of_sim(sim_info):
     """Returns a list of SimInfo objects for all biological/legal children."""
-    
-    file_path = "C:/Users/jiraa/Downloads/jira_mod/output.txt"
 
     if sim_info is None or sim_info.genealogy is None:
         return []
-    
-    with open(file_path, "w") as f:
-        display_all_attributes(sim_info.genealogy, f)
     
     # The genealogy tracker returns a list of Sim IDs
     children_ids = sim_info.genealogy.get_children_sim_ids_gen()
