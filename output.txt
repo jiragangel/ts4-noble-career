@@ -8,10 +8,6 @@ Fairfax
 0
 0
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Hawk
-3986516868
-<class 'sims4.tuning.instances.region_Residential_EP18World'>
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 0
 0
@@ -104,10 +100,6 @@ Weir
 2363457107
 <class 'sims4.tuning.instances.region_Residential_WillowCreek'>
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Delgadillo
-0
-0
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Somerhalder
 1812713502
 <class 'sims4.tuning.instances.region_Residential_WolfTown'>
@@ -119,10 +111,6 @@ Norris
 Navas
 1505295608
 <class 'sims4.tuning.instances.region_Residential_HighSchoolWorld'>
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Kenyon
-0
-0
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 4034911840
@@ -172,6 +160,22 @@ Tatum
 1491052508
 <class 'sims4.tuning.instances.region_Residential_MountainWorld'>
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Nixon
-2323227531
-<class 'sims4.tuning.instances.region_Residential_FameWorld'>
+Celebrity Guys
+1152393529
+<class 'sims4.tuning.instances.region_Residential_EP20World'>
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+McCord
+0
+0
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Snodgrass
+0
+0
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Loyd
+0
+0
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Lindsey
+1906928472
+<class 'sims4.tuning.instances.region_Residential_PetWorld'>

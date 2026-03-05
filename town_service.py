@@ -5,6 +5,7 @@ from sims4.resources import Types # type: ignore
 from sims.sim_info_types import Species # type: ignore
 
 from tuning_ids import Constants
+from utils import get_full_name
 
 def safe_iterate_town_households(output):
     # Recommended: Use a dynamic path or ensure this folder exists!
@@ -20,11 +21,6 @@ def safe_iterate_town_households(output):
             for hh in household_manager.get_all():
                 region = hh.get_home_region()
                 home_world_id = hh.get_home_world_id()
-                # utils.display_all_attributes(hh, f)
-                print("~~~~~~~~~~~~~~~~~~~~~~~~~~~", file=f)
-                print(hh.name, file=f)
-                print(home_world_id, file=f)
-                print(region, file=f)
 
                 if not region in regions and home_world_id != 0:
                     regions.append(region)
@@ -46,6 +42,7 @@ def safe_iterate_town_households(output):
                                 instance_manager = services.get_instance_manager(Types.CAREER)
                                 noble_career_tuning = instance_manager.get(Constants.NOBLE)
                                 sim_info.career_tracker.add_career(noble_career_tuning(sim_info))
+                                print(f"{get_full_name(sim_info)} processed", file=f)
 
                             break
                             

@@ -50,7 +50,6 @@ def getNobleCareerInstance(sim_info, output_func):
             output_func(f"Processing Noble: {sim_info.first_name} {sim_info.last_name}")
             return career_instance
     
-    output_func(f"Not Noble: {sim_info.first_name} {sim_info.last_name}")
     return None
 
 
