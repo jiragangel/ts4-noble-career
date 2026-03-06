@@ -6,6 +6,7 @@ import social_service
 import household_service
 import occult_service
 import town_service
+import genetics
 import services
 from utils import display_all_attributes # type: ignore
 
@@ -91,3 +92,7 @@ def _remove_aliens(_connection=None):
 def _cleanup_kingdom_manager(_connection=None):
     kingdom_manager = services.kingdom_service()
     display_all_attributes(kingdom_manager)
+
+@sims4.commands.Command('inherit_nobility', command_type=sims4.commands.CommandType.Live)
+def _inherit_nobility(_connection=None):
+    genetics.inherit_nobility(sims4.commands.CheatOutput(_connection))

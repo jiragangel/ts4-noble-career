@@ -34,7 +34,7 @@ def add_noble_career_to_sim(full_name: str, output_func):
             sim_info.career_tracker.add_career(new_career_instance)
             output_func(f"Added Noble career to {sim_info.first_name} {sim_info.last_name}")
 
-def getNobleCareerInstance(sim_info, output_func):
+def getNobleCareerInstance(sim_info):
     career_manager = services.get_instance_manager(Types.CAREER)
     Career_noble = career_manager.get(Constants.NOBLE) 
     if not sim_info.is_teen_or_older:
@@ -45,9 +45,7 @@ def getNobleCareerInstance(sim_info, output_func):
         return None
 
     for career_instance in tracker.careers.values():
-        output_func(f"career_instance: {career_instance}")
         if isinstance(career_instance, Career_noble):
-            output_func(f"Processing Noble: {sim_info.first_name} {sim_info.last_name}")
             return career_instance
     
     return None
@@ -71,7 +69,7 @@ def promote_noble_dynasty(output_func):
             continue
 
         try:
-            career_instance = getNobleCareerInstance(sim_info, output_func)
+            career_instance = getNobleCareerInstance(sim_info)
 
             if not career_instance is None:
                 promotions_given = 0

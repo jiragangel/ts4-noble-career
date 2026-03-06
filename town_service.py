@@ -36,7 +36,7 @@ def safe_iterate_town_households(output):
                         # Retrieve SimInfo by ID
                         sim_info = sim_info_manager.get(sim_id)
                         if sim_info.is_teen_or_older and sim_info.species == Species.HUMAN:
-                            career_instance = getNobleCareerInstance(sim_info, output)
+                            career_instance = getNobleCareerInstance(sim_info)
 
                             if career_instance is None:
                                 instance_manager = services.get_instance_manager(Types.CAREER)
