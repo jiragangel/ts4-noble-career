@@ -96,3 +96,7 @@ def _cleanup_kingdom_manager(_connection=None):
 @sims4.commands.Command('inherit_nobility', command_type=sims4.commands.CommandType.Live)
 def _inherit_nobility(_connection=None):
     genetics.inherit_nobility(sims4.commands.CheatOutput(_connection))
+
+@sims4.commands.Command('set_occult_per_family', command_type=sims4.commands.CommandType.Live)
+def _set_occult_per_family(_connection=None):
+    occult_service.set_occult_per_family(sims4.commands.CheatOutput(_connection))
