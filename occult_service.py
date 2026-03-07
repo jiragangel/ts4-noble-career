@@ -96,8 +96,9 @@ def remove_all_occult(sim_info):
     trait_manager = services.get_instance_manager(Types.TRAIT)
     
     for occult_id in OCCULT_TRAITS.values():
-        if sim_info.has_trait(trait_manager.get(occult_id)):
-            sim_info.remove_trait(trait_manager.get(occult_id))
+        sim_info.remove_trait(trait_manager.get(occult_id))
+    
+    sim_info.remove_trait(trait_manager.get(Constants.FAIRY_FYAE))
 
 def remove_aliens(output):
     trait_manager = services.get_instance_manager(Types.TRAIT)
