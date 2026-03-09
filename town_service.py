@@ -1,55 +1,55 @@
 from career_service import getNobleCareerInstance
 import services  # type: ignore
 import traceback
-from sims4.resources import Types # type: ignore
 from sims.sim_info_types import Species # type: ignore
+from sims4.resources import Types # type: ignore
 
 from tuning_ids import Constants
-from utils import get_full_name
+from utils import get_full_name, write_to_log
 
-def safe_iterate_town_households(output):
-    # Recommended: Use a dynamic path or ensure this folder exists!
-    file_path = "C:/Users/jiraa/Downloads/jira_mod/output.txt"
+def create_noble_per_town(output):
     regions = []
     
-    with open(file_path, "w") as f:
-        print("Starting Town/Household Iteration...", file=f)
-        try:
-            # Retrieve all world data
-            household_manager = services.household_manager()
+    write_to_log("Starting Town/Household Iteration...")
+    try:
+        # Retrieve all world data
+        household_manager = services.household_manager()
 
-            for hh in household_manager.get_all():
-                region = hh.get_home_region()
-                home_world_id = hh.get_home_world_id()
+        for hh in household_manager.get_all():
+            region = hh.get_home_region()
+            home_world_id = hh.get_home_world_id()
 
-                if not region in regions and home_world_id != 0:
-                    regions.append(region)
+            if not region in regions and home_world_id != 0:
+                regions.append(region)
 
-                    sims_at_home = hh.get_sims_at_home()
+                sims_at_home = hh.get_sims_at_home()
 
-                    for sim_id in sims_at_home:
-                        sim_info_manager = services.sim_info_manager()
-    
-                        if sim_info_manager is None:
-                            return None
+                for sim_id in sims_at_home:
+                    sim_info_manager = services.sim_info_manager()
 
-                        # Retrieve SimInfo by ID
-                        sim_info = sim_info_manager.get(sim_id)
-                        if sim_info.is_teen_or_older and sim_info.species == Species.HUMAN:
-                            career_instance = getNobleCareerInstance(sim_info)
+                    if sim_info_manager is None:
+                        return None
 
-                            if career_instance is None:
-                                instance_manager = services.get_instance_manager(Types.CAREER)
-                                noble_career_tuning = instance_manager.get(Constants.NOBLE)
-                                sim_info.career_tracker.add_career(noble_career_tuning(sim_info))
-                                print(f"{get_full_name(sim_info)} processed", file=f)
+                    # Retrieve SimInfo by ID
+                    sim_info = sim_info_manager.get(sim_id)
+                    if sim_info.is_teen_or_older and sim_info.species == Species.HUMAN:
+                        career_instance = getNobleCareerInstance(sim_info)
 
-                            break
-                            
-                    print("~~~~~~~~~~~~~~~~~~~~~~~~~~~")
+                        if career_instance is None:
+                            kingdom_manager = services.kingdom_service()
+                            kingdom_manager.add_noble_career(sim_id)
+                            instance_manager = services.get_instance_manager(Types.CAREER)
+                            noble_career_tuning = instance_manager.get(Constants.NOBLE)
+                            sim_info.career_tracker.add_career(noble_career_tuning(sim_info))
+                                
+                            write_to_log(f"{get_full_name(sim_info)} processed")
 
+                        break
+                        
                 print("~~~~~~~~~~~~~~~~~~~~~~~~~~~")
 
-        except Exception as global_err:
-            print(f"Critical script failure: {global_err}", file=f)
-            print(traceback.format_exc(), file=f)
+            print("~~~~~~~~~~~~~~~~~~~~~~~~~~~")
+
+    except Exception as global_err:
+        write_to_log(f"Critical script failure: {global_err}")
+        write_to_log(traceback.format_exc())

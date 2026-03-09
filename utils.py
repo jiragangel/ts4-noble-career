@@ -23,6 +23,8 @@ def display_all_attributes(object):
                     write_to_log(f"* {name}: {parameter.annotation}")
                 else:
                     write_to_log(f"* {name}: No type hint")
+            
+            write_to_log(f"Returns {value.__annotations__['return']}")
 
         except Exception as e:
             write_to_log(f"{name}: {value}")

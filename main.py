@@ -10,6 +10,9 @@ import genetics
 import services
 from utils import display_all_attributes # type: ignore
 
+with open("C:/Users/jiraa/Downloads/jira_mod/output.txt", "w") as f:
+    print("File cleared")
+
 @sims4.commands.Command('increase_celebrity_by_lastname', command_type=sims4.commands.CommandType.Live)
 def _increase_celebrity_by_lastname(last_name: str = '',  fame_points: int = 1000, _connection=None):
     output = sims4.commands.CheatOutput(_connection)
@@ -82,7 +85,7 @@ def _rename_unmarried_sims(_connection=None):
 
 @sims4.commands.Command('create_noble_per_town', command_type=sims4.commands.CommandType.Live)
 def _create_noble_per_town(_connection=None):
-    town_service.safe_iterate_town_households(sims4.commands.CheatOutput(_connection))
+    town_service.create_noble_per_town(sims4.commands.CheatOutput(_connection))
 
 @sims4.commands.Command('remove_aliens', command_type=sims4.commands.CommandType.Live)
 def _remove_aliens(_connection=None):
