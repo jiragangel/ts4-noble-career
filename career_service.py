@@ -33,6 +33,12 @@ def add_noble_career_to_sim(full_name: str, output_func):
             new_career_instance = noble_career_tuning(sim_info)
             sim_info.career_tracker.add_career(new_career_instance)
             output_func(f"Added Noble career to {sim_info.first_name} {sim_info.last_name}")
+            
+            kingdom_manager = services.kingdom_service()
+            kingdom_manager.add_noble_career(sim_info.id)
+            instance_manager = services.get_instance_manager(Types.CAREER)
+            noble_career_tuning = instance_manager.get(Constants.NOBLE)
+            sim_info.career_tracker.add_career(noble_career_tuning(sim_info))
 
 def getNobleCareerInstance(sim_info):
     career_manager = services.get_instance_manager(Types.CAREER)

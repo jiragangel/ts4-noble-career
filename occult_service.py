@@ -126,7 +126,7 @@ def randomize_occults(output_func):
                 sim_info.add_trait(trait)
                 if OCCULT_TRAITS[choice_name] == Constants.FAIRY:
                     sim_info.add_trait(trait_manager.get(Constants.FAIRY_FYAE))
-                output_func(f"Converted {sim_info.first_name} to {choice_name}")
+                output_func(f"Converted {get_full_name(sim_info)} to {choice_name}")
 
 
 
