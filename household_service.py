@@ -6,7 +6,7 @@ from tuning_ids import Constants
 from utils import get_children_of_sim
 from sims4.resources import Types # type: ignore
 
-exempted_surnames = ['Everhart', 'Crowmoor', 'Beaumont', 'Salvatore', 'Triton']
+exempted_surnames = ['Sakamoto', "Runecrest"]
 
 def update_all_household_funds(amount: int, output_func):
     household_manager = services.household_manager()
@@ -74,7 +74,7 @@ def get_surname(sim_info):
     trait_manager = services.get_instance_manager(Types.TRAIT)
     
     if sim_info.has_trait(trait_manager.get(Constants.MERMAID)):
-        return random.choice(lists.mermaid_surnames)
+        return random.choice(lists.get_mermaid_surnames())
     
     if sim_info.has_trait(trait_manager.get(Constants.FAIRY)):
         return random.choice(lists.fairy_surnames)
@@ -83,15 +83,13 @@ def get_surname(sim_info):
         return random.choice(lists.werewolf_surnames)
     
     if sim_info.has_trait(trait_manager.get(Constants.WITCH)):
-        return random.choice(lists.spellcaster_surnames)
+        return random.choice(lists.get_spellcaster_surnames())
       
     return random.choice(lists.surnames)
 
 def randomize_townie_marriage_names(output):
     try:
-        active_household_id = services.active_household_id()
-        
-        processed_sim_ids = set()
+        processed_sim_ids = []
         count = 0
         error_count = 0
 
@@ -101,7 +99,10 @@ def randomize_townie_marriage_names(output):
             if sim_info is None or not hasattr(sim_info, 'sim_id'):
                 continue
 
-            if sim_info.sim_id in processed_sim_ids or sim_info.household_id == active_household_id:
+            if sim_info.last_name in exempted_surnames:
+                continue
+
+            if sim_info.sim_id in processed_sim_ids:
                 continue
 
             if sim_info.gender != Gender.FEMALE: 
@@ -120,8 +121,8 @@ def randomize_townie_marriage_names(output):
                     spouse_info.first_name = get_name(spouse_info)
                     spouse_info.last_name = new_surname
                     
-                    processed_sim_ids.add(sim_info.sim_id)
-                    processed_sim_ids.add(spouse_info.sim_id)
+                    processed_sim_ids.append(sim_info.sim_id)
+                    processed_sim_ids.append(spouse_info.sim_id)
                     
                     count += 1
                     log_msg = f"SUCCESS: {old_names} -> {sim_info.first_name} & {spouse_info.first_name} {new_surname}"
@@ -137,6 +138,7 @@ def randomize_townie_marriage_names(output):
                         if not child_spouse_info:
                             child.last_name = new_surname
                             child.first_name = get_name(child)
+                            processed_sim_ids.append(child.sim_id)
                     
                     log_msg = f"SUCCESS: {new_surname} family"
                     output(log_msg)
