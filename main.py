@@ -67,9 +67,9 @@ def _jira_help(_connection=None):
     output('remove_aliens')
 
 @sims4.commands.Command('promote_all_nobles', command_type=sims4.commands.CommandType.Live)
-def _promote_noble_dynasty(_connection=None):
+def _promote_noble_dynasty(count: int, _connection=None):
     output = sims4.commands.CheatOutput(_connection)
-    career_service.promote_noble_dynasty(output)
+    career_service.promote_noble_dynasty(output, count)
 
 @sims4.commands.Command('hellow', command_type=sims4.commands.CommandType.Live)
 def _say_hello(_connection=None):

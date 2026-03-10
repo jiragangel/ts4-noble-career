@@ -57,7 +57,7 @@ def getNobleCareerInstance(sim_info):
     return None
 
 
-def promote_noble_dynasty(output_func):
+def promote_noble_dynasty(output_func, count: int):
     # 1. Get the Noble Career class from the instance manager
     # Replace 123456789 with your career's Decimal Tuning ID
     career_manager = services.get_instance_manager(Types.CAREER)
@@ -80,6 +80,8 @@ def promote_noble_dynasty(output_func):
             if not career_instance is None:
                 promotions_given = 0
                 noOfPromotions = random.randint(0, 5)
+                if not count is None:
+                    noOfPromotions = count
                 for _ in range(noOfPromotions):
                     career_instance.promote()
                     promotions_given += 1

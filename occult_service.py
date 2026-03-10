@@ -19,7 +19,6 @@ VALID_OCCULT_TRAITS = ['Witch', 'Werewolf', 'Mermaid', 'Fairy']
 def set_occult_per_family(output):
     try:
         trait_manager = services.get_instance_manager(Types.TRAIT)
-        active_household_id = services.active_household_id()
         
         count = 0
         error_count = 0
@@ -28,9 +27,6 @@ def set_occult_per_family(output):
 
         for sim_info in all_sims:
             if sim_info is None or not hasattr(sim_info, 'sim_id'):
-                continue
-
-            if sim_info.household_id == active_household_id:
                 continue
 
             if sim_info.gender != Gender.FEMALE: 
