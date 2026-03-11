@@ -11,8 +11,9 @@ def inherit_nobility(output_func):
             if not parent_career == None:
                 children_info = parent_info.genealogy.get_child_sim_infos_gen()
 
-                hierarchy = parent_career.level - 1
+                hierarchy = parent_career.level
                 for child_info in children_info:
+                    hierarchy = hierarchy - 2
                     if child_info.is_teen_or_older:
                         child_career = getNobleCareerInstance(child_info)
 
@@ -26,7 +27,6 @@ def inherit_nobility(output_func):
                             
                         write_to_log(f"{get_full_name(child_info)}({child_career.user_level}) is now a noble. Inherited from {get_full_name(parent_info)}({parent_career.user_level})")
 
-                    hierarchy = hierarchy - 1
 
     except Exception as e:
         output_func(f"Error: {e}")
