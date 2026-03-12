@@ -105,5 +105,5 @@ def _set_occult_per_family(_connection=None):
     occult_service.set_occult_per_family(sims4.commands.CheatOutput(_connection))
 
 @sims4.commands.Command('promote_to_queen_king', command_type=sims4.commands.CommandType.Live)
-def _promote_to_queen_king(_connection=None):
-    genetics.promote_to_queen_king(sims4.commands.CheatOutput(_connection))
+def _promote_to_queen_king():
+    genetics.promote_to_queen_king()
