@@ -339,3 +339,12 @@ def get_mermaid_surnames():
             mermaid_surnames.append(line.strip())
     
     return mermaid_surnames
+
+def get_exempted_surnames():
+    exempted_surnames = []
+    with open('C:/Users/jiraa/Downloads/jira_mod/names/exempted_surname.txt', 'r') as file:
+        for line in file:
+            # Use line.strip() to remove leading/trailing whitespace, including the newline character
+            exempted_surnames.append(line.strip())
+    
+    return exempted_surnames

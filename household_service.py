@@ -6,8 +6,6 @@ from tuning_ids import Constants
 from utils import get_children_of_sim
 from sims4.resources import Types # type: ignore
 
-exempted_surnames = ['Sakamoto', "Runecrest"]
-
 def update_all_household_funds(amount: int, output_func):
     household_manager = services.household_manager()
     count = 0
@@ -99,7 +97,7 @@ def randomize_townie_marriage_names(output):
             if sim_info is None or not hasattr(sim_info, 'sim_id'):
                 continue
 
-            if sim_info.last_name in exempted_surnames:
+            if sim_info.last_name in lists.get_exempted_surnames():
                 continue
 
             if sim_info.sim_id in processed_sim_ids:
@@ -171,7 +169,7 @@ def randomize_townie_unmarried(output):
             if sim_info.household_id == active_household_id:
                 continue
 
-            if sim_info.last_name in exempted_surnames:
+            if sim_info.last_name in lists.get_exempted_surnames():
                 continue
 
             try:
