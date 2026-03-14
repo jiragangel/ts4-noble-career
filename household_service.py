@@ -75,7 +75,7 @@ def get_surname(sim_info):
         return random.choice(lists.get_mermaid_surnames())
     
     if sim_info.has_trait(trait_manager.get(Constants.FAIRY)):
-        return random.choice(lists.fairy_surnames)
+        return random.choice(lists.get_fairy_surnames())
     
     if sim_info.has_trait(trait_manager.get(Constants.WEREWOLF)):
         return random.choice(lists.werewolf_surnames)

@@ -214,59 +214,6 @@ male_vampire_names = [
     "Stefan", "Theron", "Tristan", "Valerian", "Valentin", "Viktor", "Vladimir", "Xander", "Zarek", "Zavian"
 ]
 
-fairy_surnames = [
-    "Dewpetal",
-    "Moonblossom",
-    "Thistlewing",
-    "Silverpetal",
-    "Glowbloom",
-    "Petalwhisper",
-    "Starwillow",
-    "Sunpetal",
-    "Fernlight",
-    "Honeyblossom",
-    "Dewwillow",
-    "Petalglimmer",
-    "Brightfern",
-    "Mosswhisper",
-    "Cloverglow",
-    "Mistpetal",
-    "Rosewing",
-    "Lilyspark",
-    "Bloomwhisper",
-    "Amberleaf",
-    "Glimmerfern",
-    "Thornpetal",
-    "Moonfern",
-    "Daisyglow",
-    "Petalshade",
-    "Sunbloom",
-    "Wildpetal",
-    "Glowthistle",
-    "Fawnwillow",
-    "Crystalpetal",
-    "Meadowglow",
-    "Fernwhisper",
-    "Willowgleam",
-    "Petalshade",
-    "Mossbloom",
-    "Starlily",
-    "Glimmerrose",
-    "Honeyfern",
-    "Dewthorn",
-    "Butterbloom",
-    "Petalgleam",
-    "Thistleflare",
-    "Moonpetal",
-    "Bloomgleam",
-    "Fairwillow",
-    "Glowwillow",
-    "Rosegleam",
-    "Starbloom",
-    "Petalflare",
-    "Fernbloom"
-]
-
 werewolf_surnames = [
     "Wolfbane",
     "Moonfang",
@@ -320,11 +267,18 @@ werewolf_surnames = [
     "Wildfang"
 ]
 
-file_path = 'C:/Users/jiraa/Downloads/jira_mod/names/spellcaster_surname.txt'
+def get_fairy_surnames():
+    fairy_surnames = []
+    with open('C:/Users/jiraa/Downloads/jira_mod/names/fairy_surname.txt', 'r') as file:
+        for line in file:
+            # Use line.strip() to remove leading/trailing whitespace, including the newline character
+            fairy_surnames.append(line.strip())
+    
+    return fairy_surnames
 
 def get_spellcaster_surnames():
     spellcaster_surnames = []
-    with open(file_path, 'r') as file:
+    with open('C:/Users/jiraa/Downloads/jira_mod/names/spellcaster_surname.txt', 'r') as file:
         for line in file:
             # Use line.strip() to remove leading/trailing whitespace, including the newline character
             spellcaster_surnames.append(line.strip())
