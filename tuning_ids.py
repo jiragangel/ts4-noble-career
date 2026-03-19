@@ -15,3 +15,4 @@ class Constants:
     CULINARY = 9231
     ENTERTAINER = 27929
     ALIEN = 102785
+    NOBLE_HUSTLER = 485547

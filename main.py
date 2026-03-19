@@ -5,10 +5,8 @@ import career_service
 import social_service
 import household_service
 import occult_service
-import town_service
 import genetics
-import services
-from utils import display_all_attributes # type: ignore
+import utils
 
 with open("C:/Users/jiraa/Downloads/jira_mod/output.txt", "w") as f:
     print("File cleared")
@@ -66,11 +64,6 @@ def _jira_help(_connection=None):
     output('create_noble_per_town')
     output('remove_aliens')
 
-@sims4.commands.Command('promote_all_nobles', command_type=sims4.commands.CommandType.Live)
-def _promote_noble_dynasty(count: int, _connection=None):
-    output = sims4.commands.CheatOutput(_connection)
-    career_service.promote_noble_dynasty(output, count)
-
 @sims4.commands.Command('hellow', command_type=sims4.commands.CommandType.Live)
 def _say_hello(_connection=None):
     sims4.commands.CheatOutput(_connection)('Hello World')
@@ -83,18 +76,9 @@ def _randomize_townie_marriage_names(_connection=None):
 def _rename_unmarried_sims(_connection=None):
     household_service.randomize_townie_unmarried(sims4.commands.CheatOutput(_connection))
 
-@sims4.commands.Command('create_noble_per_town', command_type=sims4.commands.CommandType.Live)
-def _create_noble_per_town(_connection=None):
-    town_service.create_noble_per_town(sims4.commands.CheatOutput(_connection))
-
 @sims4.commands.Command('remove_aliens', command_type=sims4.commands.CommandType.Live)
 def _remove_aliens(_connection=None):
     occult_service.remove_aliens(sims4.commands.CheatOutput(_connection))
-
-@sims4.commands.Command('cleanup_kingdom_manager', command_type=sims4.commands.CommandType.Live)
-def _cleanup_kingdom_manager(_connection=None):
-    kingdom_manager = services.kingdom_service()
-    display_all_attributes(kingdom_manager)
 
 @sims4.commands.Command('inherit_nobility', command_type=sims4.commands.CommandType.Live)
 def _inherit_nobility(_connection=None):
@@ -107,3 +91,7 @@ def _set_occult_per_family(_connection=None):
 @sims4.commands.Command('promote_to_queen_king', command_type=sims4.commands.CommandType.Live)
 def _promote_to_queen_king():
     genetics.promote_to_queen_king()
+
+@sims4.commands.Command('cleanup_hustler', command_type=sims4.commands.CommandType.Live)
+def _cleanup_hustler():
+    utils.cleanup_hustler()

@@ -1,5 +1,7 @@
 import inspect
 import services # type: ignore
+from sims4.resources import Types # type: ignore
+from tuning_ids import Constants # type: ignore
 
 LOG_FILE_PATH = 'C:/Users/jiraa/Downloads/jira_mod/output.txt'
 
@@ -49,3 +51,9 @@ def get_children_of_sim(sim_info):
             children_sim_infos.append(child_info)
             
     return children_sim_infos
+
+def cleanup_hustler():
+    trait_manager = services.get_instance_manager(Types.TRAIT)
+    sim_manager = services.sim_info_manager()
+    for sim_info in sim_manager.get_all():
+        sim_info.remove_trait(trait_manager.get(Constants.NOBLE_HUSTLER))
