@@ -5,6 +5,13 @@ from tuning_ids import Constants # type: ignore
 
 LOG_FILE_PATH = 'C:/Users/jiraa/Downloads/jira_mod/output.txt'
 
+def check_bit_on_sim(sim_info_a, sim_info_b, bit_instance):
+    try:
+        # sim_info_a.relationship_tracker is the RelationshipTracker
+        return sim_info_a.relationship_tracker.has_bit(sim_info_b.sim_id, bit_instance)
+    except Exception as e:
+        write_to_log(f"Unexpected error in check_bit_on_sim: {e}")
+
 def write_to_log(message):
     """Simple helper to append lines to our custom text file."""
     with open(LOG_FILE_PATH, 'a', encoding='utf-8') as f:

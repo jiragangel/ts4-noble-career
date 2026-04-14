@@ -16,3 +16,4 @@ class Constants:
     ENTERTAINER = 27929
     ALIEN = 102785
     NOBLE_HUSTLER = 485547
+    BROKEN_UP = 15811
