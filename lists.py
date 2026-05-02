@@ -74,7 +74,7 @@ male_names = [
 "Ulric","Victor","Weston","Xylon","York","Zeke",
 
 "Abel","Brent","Clifford","Damon","Erik","Forrest","Gareth","Harlan","Ira","Jonas",
-"Kurt","Luther","Micah","Noah","Otis","Phillip","Reuben","Shawn","Troy","Uriah",
+"Kurt","Luther","Micah","Noah","Otis","Phillip","Reuben","Shawn","Troy",
 "Vernon","Wayne","Xerxes","Yosef","Zavier",
 
 "Adolfo","Bernard","Conrad","Desmond","Eugene","Franklin","Gordon","Howard","Irvin","Jerald",

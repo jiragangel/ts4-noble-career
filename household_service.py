@@ -39,29 +39,29 @@ def get_spouse_info_by_id(sim_id):
 def get_name(sim_info):
     trait_manager = services.get_instance_manager(Types.TRAIT)
     
-    if sim_info.has_trait(trait_manager.get(Constants.FAIRY)):
-        if sim_info.gender == Gender.FEMALE:
-            return random.choice(lists.female_fairy_names)
-        else:
-            return random.choice(lists.male_fairy_names)
+    # if sim_info.has_trait(trait_manager.get(Constants.FAIRY)):
+    #     if sim_info.gender == Gender.FEMALE:
+    #         return random.choice(lists.female_fairy_names)
+    #     else:
+    #         return random.choice(lists.male_fairy_names)
     
-    if sim_info.has_trait(trait_manager.get(Constants.MERMAID)):
-        if sim_info.gender == Gender.FEMALE:
-            return random.choice(lists.female_mermaid_names)
-        else:
-            return random.choice(lists.male_mermaid_names)
+    # if sim_info.has_trait(trait_manager.get(Constants.MERMAID)):
+    #     if sim_info.gender == Gender.FEMALE:
+    #         return random.choice(lists.female_mermaid_names)
+    #     else:
+    #         return random.choice(lists.male_mermaid_names)
     
-    if sim_info.has_trait(trait_manager.get(Constants.WEREWOLF)):
-        if sim_info.gender == Gender.FEMALE:
-            return random.choice(lists.female_werewolf_names)
-        else:
-            return random.choice(lists.male_werewolf_names)
+    # if sim_info.has_trait(trait_manager.get(Constants.WEREWOLF)):
+    #     if sim_info.gender == Gender.FEMALE:
+    #         return random.choice(lists.female_werewolf_names)
+    #     else:
+    #         return random.choice(lists.male_werewolf_names)
     
-    if sim_info.has_trait(trait_manager.get(Constants.VAMPIRE)):
-        if sim_info.gender == Gender.FEMALE:
-            return random.choice(lists.female_vampire_names)
-        else:
-            return random.choice(lists.male_vampire_names)
+    # if sim_info.has_trait(trait_manager.get(Constants.VAMPIRE)):
+    #     if sim_info.gender == Gender.FEMALE:
+    #         return random.choice(lists.female_vampire_names)
+    #     else:
+    #         return random.choice(lists.male_vampire_names)
         
     if sim_info.gender == Gender.FEMALE:
         return random.choice(lists.female_names)
@@ -71,17 +71,17 @@ def get_name(sim_info):
 def get_surname(sim_info):
     trait_manager = services.get_instance_manager(Types.TRAIT)
     
-    if sim_info.has_trait(trait_manager.get(Constants.MERMAID)):
-        return random.choice(lists.get_mermaid_surnames())
+    # if sim_info.has_trait(trait_manager.get(Constants.MERMAID)):
+    #     return random.choice(lists.get_mermaid_surnames())
     
-    if sim_info.has_trait(trait_manager.get(Constants.FAIRY)):
-        return random.choice(lists.get_fairy_surnames())
+    # if sim_info.has_trait(trait_manager.get(Constants.FAIRY)):
+    #     return random.choice(lists.get_fairy_surnames())
     
-    if sim_info.has_trait(trait_manager.get(Constants.WEREWOLF)):
-        return random.choice(lists.werewolf_surnames)
+    # if sim_info.has_trait(trait_manager.get(Constants.WEREWOLF)):
+    #     return random.choice(lists.werewolf_surnames)
     
-    if sim_info.has_trait(trait_manager.get(Constants.WITCH)):
-        return random.choice(lists.get_spellcaster_surnames())
+    # if sim_info.has_trait(trait_manager.get(Constants.WITCH)):
+    #     return random.choice(lists.get_spellcaster_surnames())
       
     return random.choice(lists.surnames)
 
