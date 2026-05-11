@@ -11,15 +11,21 @@ def get_partner(target_sim, output_func):
     for sim in sim_manager.get_all():
         if sim.sim_id != target_sim.sim_id and sim.age == target_sim.age and sim.gender != target_sim.gender and not check_bit_on_sim(sim, target_sim, bit_manager.get(Constants.BROKEN_UP)):
             # Check for existing partner bit (15825)
-            if not any((bit.guid64 == Constants.PARTNER) for bit in sim.relationship_tracker.get_all_bits()):
+            if not any((bit.guid64 == Constants.PARTNER or bit.guid64 == Constants.SECRET_LOVER) for bit in sim.relationship_tracker.get_all_bits()):
                 match_sim = sim
                 break
+            else:
+                output_func(f"Not a match {get_full_name(sim)} for {get_full_name(target_sim)}")
 
     if match_sim:
         stat_manager = services.get_instance_manager(Types.STATISTIC)
+
+        relationship_bit = bit_manager.get(Constants.PARTNER);
+        if any((bit.guid64 == Constants.PARTNER or bit.guid64 == Constants.MARRIED) for bit in target_sim.relationship_tracker.get_all_bits()):
+            relationship_bit = bit_manager.get(Constants.SECRET_LOVER);
         
         # Add Bits and Scores
-        target_sim.relationship_tracker.add_relationship_bit(match_sim.sim_id, bit_manager.get(Constants.PARTNER)) # Married
+        target_sim.relationship_tracker.add_relationship_bit(match_sim.sim_id, relationship_bit) # Married
         target_sim.relationship_tracker.add_relationship_bit(match_sim.sim_id, bit_manager.get(Constants.HAS_MET)) # Has Met
         target_sim.relationship_tracker.set_relationship_score(match_sim.sim_id, 100, stat_manager.get(Constants.FRIENDSHIP)) # Friendship
         target_sim.relationship_tracker.set_relationship_score(match_sim.sim_id, 100, stat_manager.get(Constants.ROMANCE)) # Romance
