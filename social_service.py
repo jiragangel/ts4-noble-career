@@ -11,7 +11,7 @@ def get_partner(target_sim, output_func):
     for sim in sim_manager.get_all():
         if sim.sim_id != target_sim.sim_id and sim.age == target_sim.age and sim.gender != target_sim.gender and not check_bit_on_sim(sim, target_sim, bit_manager.get(Constants.BROKEN_UP)):
             # Check for existing partner bit (15825)
-            if not any((bit.guid64 == Constants.PARTNER or bit.guid64 == Constants.SECRET_LOVER) for bit in sim.relationship_tracker.get_all_bits()):
+            if not any((bit.guid64 == Constants.PARTNER or bit.guid64 == Constants.SECRET_LOVER) for bit in sim.relationship_tracker.get_all_bits()) and get_full_name(sim) != 'Grim Reaper':
                 match_sim = sim
                 break
             else:

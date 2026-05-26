@@ -8,7 +8,7 @@ import occult_service
 import genetics
 import utils
 
-with open("C:/Users/jiraa/Downloads/jira_mod/output.txt", "w") as f:
+with open("C:/Users/jiraa/Documents/Electronic Arts/The Sims 4/Mods/jira_mod/output.txt", "w") as f:
     print("File cleared")
 
 @sims4.commands.Command('increase_celebrity_by_lastname', command_type=sims4.commands.CommandType.Live)
@@ -89,8 +89,8 @@ def _set_occult_per_family(_connection=None):
     occult_service.set_occult_per_family(sims4.commands.CheatOutput(_connection))
 
 @sims4.commands.Command('promote_to_queen_king', command_type=sims4.commands.CommandType.Live)
-def _promote_to_queen_king():
-    genetics.promote_to_queen_king()
+def _promote_to_queen_king(_connection=None):
+    genetics.promote_to_queen_king(sims4.commands.CheatOutput(_connection))
 
 @sims4.commands.Command('cleanup_hustler', command_type=sims4.commands.CommandType.Live)
 def _cleanup_hustler():

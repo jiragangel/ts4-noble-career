@@ -3,7 +3,7 @@ import services # type: ignore
 from sims4.resources import Types # type: ignore
 from tuning_ids import Constants # type: ignore
 
-LOG_FILE_PATH = 'C:/Users/jiraa/Downloads/jira_mod/output.txt'
+LOG_FILE_PATH = 'C:/Users/jiraa/Documents/Electronic Arts/The Sims 4/Mods/jira_mod/output.txt'
 
 def check_bit_on_sim(sim_info_a, sim_info_b, bit_instance):
     try:

@@ -269,7 +269,7 @@ werewolf_surnames = [
 
 def get_fairy_surnames():
     fairy_surnames = []
-    with open('C:/Users/jiraa/Downloads/jira_mod/names/fairy_surname.txt', 'r') as file:
+    with open('C:/Users/jiraa/Documents/Electronic Arts/The Sims 4/Mods/jira_mod/names/fairy_surname.txt', 'r') as file:
         for line in file:
             # Use line.strip() to remove leading/trailing whitespace, including the newline character
             fairy_surnames.append(line.strip())
@@ -278,7 +278,7 @@ def get_fairy_surnames():
 
 def get_spellcaster_surnames():
     spellcaster_surnames = []
-    with open('C:/Users/jiraa/Downloads/jira_mod/names/spellcaster_surname.txt', 'r') as file:
+    with open('C:/Users/jiraa/Documents/Electronic Arts/The Sims 4/Mods/jira_mod/names/spellcaster_surname.txt', 'r') as file:
         for line in file:
             # Use line.strip() to remove leading/trailing whitespace, including the newline character
             spellcaster_surnames.append(line.strip())
@@ -287,7 +287,7 @@ def get_spellcaster_surnames():
 
 def get_mermaid_surnames():
     mermaid_surnames = []
-    with open('C:/Users/jiraa/Downloads/jira_mod/names/mermaid_surname.txt', 'r') as file:
+    with open('C:/Users/jiraa/Documents/Electronic Arts/The Sims 4/Mods/jira_mod/names/mermaid_surname.txt', 'r') as file:
         for line in file:
             # Use line.strip() to remove leading/trailing whitespace, including the newline character
             mermaid_surnames.append(line.strip())
@@ -296,7 +296,7 @@ def get_mermaid_surnames():
 
 def get_exempted_surnames():
     exempted_surnames = []
-    with open('C:/Users/jiraa/Downloads/jira_mod/names/exempted_surname.txt', 'r') as file:
+    with open('C:/Users/jiraa/Documents/Electronic Arts/The Sims 4/Mods/jira_mod/names/exempted_surname.txt', 'r') as file:
         for line in file:
             # Use line.strip() to remove leading/trailing whitespace, including the newline character
             exempted_surnames.append(line.strip())

@@ -44,7 +44,7 @@ def list_all_regions():
     for region in region_manager.types.values():
         write_to_log(region)
 
-def promote_to_queen_king():
+def promote_to_queen_king(output_func):
     groups = defaultdict(list)
 
     for sim_info in services.sim_info_manager().get_all():
@@ -95,7 +95,7 @@ def promote_to_queen_king():
                     instance_manager = services.get_instance_manager(Types.CAREER)
                     noble_career_tuning = instance_manager.get(Constants.NOBLE)
                     sim_info.career_tracker.add_career(noble_career_tuning(sim_info))
-                    write_to_log(f"Added Noble career to {sim_info.first_name} {sim_info.last_name}")
+                    output_func(f"Added Noble career to {sim_info.first_name} {sim_info.last_name} from {region}")
 
                     break
         else:

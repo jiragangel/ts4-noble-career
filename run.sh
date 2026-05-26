@@ -2,7 +2,7 @@
 
 # Configuration
 MOD_NAME="jira_mod"
-TARGET_DIR="/c/Users/jiraa/Documents/Electronic Arts/The Sims 4/Mods"
+TARGET_DIR="/c/Users/jiraa/Documents/Electronic Arts/The Sims 4/Mods/jira_mod"
 
 # 1. Filter and iterate through .py files
 FILES=$(ls *.py 2>/dev/null)

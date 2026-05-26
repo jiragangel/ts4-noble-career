@@ -19,3 +19,4 @@ class Constants:
     BROKEN_UP = 15811
     SECRET_LOVER = 491011
     MARRIED = 15822
+    DOCTOR = 107230

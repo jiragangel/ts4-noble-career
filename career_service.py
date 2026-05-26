@@ -17,7 +17,7 @@ def add_random_career(output_func):
 
             if (len(tracker.careers.values()) == 0):
                 # Instantiate and add career
-                career_tuning = instance_manager.get(random.choice([Constants.BUSINESS, Constants.CULINARY, Constants.ENTERTAINER]))
+                career_tuning = instance_manager.get(random.choice([Constants.BUSINESS, Constants.CULINARY, Constants.ENTERTAINER, Constants.DOCTOR]))
                 new_career_instance = career_tuning(sim_info)
                 sim_info.career_tracker.add_career(new_career_instance)
                 output_func(f"Added career to {sim_info.first_name} {sim_info.last_name}")
