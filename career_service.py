@@ -2,7 +2,8 @@ import services # type: ignore
 from sims4.resources import Types # type: ignore
 from tuning_ids import Constants
 import random
-from sims.sim_info_types import Species # type: ignore
+from sims.sim_info_types import Species
+from utils import get_full_name # type: ignore
 
 def add_random_career(output_func):
     instance_manager = services.get_instance_manager(Types.CAREER)
@@ -27,26 +28,31 @@ def add_random_career(output_func):
                 career_instance.promote(promotion_count)
                 output_func(f"Added career to {sim_info.first_name} {sim_info.last_name} and promoted {promotion_count} times.")
 
-def add_noble_career_to_sim(full_name: str, output_func):
-    search_full_name = full_name.strip().lower()
+def add_noble_career_to_sim(output_func, sim_info, target_career_level = random.randint(1, 6)):
     noble_career_id = Constants.NOBLE
     instance_manager = services.get_instance_manager(Types.CAREER)
     noble_career_tuning = instance_manager.get(noble_career_id)
 
-    for sim_info in services.sim_info_manager().get_all():
-        if (search_full_name in f"{sim_info.first_name.lower()} {sim_info.last_name.lower()}" and sim_info.is_teen_or_older) or (not search_full_name and sim_info.is_teen_or_older):
-            # Instantiate and add career
-            new_career_instance = noble_career_tuning(sim_info)
-            sim_info.career_tracker.add_career(new_career_instance)
-            output_func(f"Added Noble career to {sim_info.first_name} {sim_info.last_name}")
-            
-            kingdom_manager = services.kingdom_service()
-            kingdom_manager.add_noble_career(sim_info.id)
-            instance_manager = services.get_instance_manager(Types.CAREER)
-            noble_career_tuning = instance_manager.get(Constants.NOBLE)
-            sim_info.career_tracker.add_career(noble_career_tuning(sim_info))
+    # Instantiate and add career
+    new_career_instance = noble_career_tuning(sim_info)
+    sim_info.career_tracker.add_career(new_career_instance)
+    
+    kingdom_manager = services.kingdom_service()
+    kingdom_manager.add_noble_career(sim_info.id)
+    instance_manager = services.get_instance_manager(Types.CAREER)
+    noble_career_tuning = instance_manager.get(Constants.NOBLE)
+    sim_info.career_tracker.add_career(noble_career_tuning(sim_info))
 
-            break
+    career_instance = getCareerInstance(sim_info, Constants.NOBLE)
+    if target_career_level > career_instance.level:
+        career_instance.promote(target_career_level - career_instance.level)
+    output_func(f"Added Noble career ({target_career_level}) to {sim_info.first_name} {sim_info.last_name}")
+
+def randomize_nobles(output_func):
+    for sim_info in services.sim_info_manager().get_all():
+        if sim_info.is_teen and random.randint(1, 4) == 1 and sim_info.species == Species.HUMAN:
+           add_noble_career_to_sim(output_func, sim_info)
+
 
 def getCareerInstance(sim_info, career_id = Constants.NOBLE):
     career_manager = services.get_instance_manager(Types.CAREER)
@@ -63,3 +69,16 @@ def getCareerInstance(sim_info, career_id = Constants.NOBLE):
             return career_instance
     
     return None
+
+def isValidForCareer(sim_info):
+    if not sim_info.is_teen_or_older:
+        return False
+
+    tracker = sim_info.career_tracker
+    if tracker is None:
+        return True
+
+    if len(tracker.careers.values()) > 0:
+        return False
+    
+    return True
