@@ -254,6 +254,15 @@ werewolf_surnames = [
     "Wildfang"
 ]
 
+def get_royal_surnames():
+    royal_surnames = []
+    with open('C:/Users/jiraa/Documents/Electronic Arts/The Sims 4/Mods/jira_mod/names/royal_surname.txt', 'r') as file:
+        for line in file:
+            # Use line.strip() to remove leading/trailing whitespace, including the newline character
+            royal_surnames.append(line.strip())
+    
+    return royal_surnames
+
 def get_fairy_surnames():
     fairy_surnames = []
     with open('C:/Users/jiraa/Documents/Electronic Arts/The Sims 4/Mods/jira_mod/names/fairy_surname.txt', 'r') as file:

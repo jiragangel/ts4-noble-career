@@ -1,8 +1,6 @@
-import services # type: ignore
-from send_home import send_sim_home
 import sims4.commands  # type: ignore
 # Import our new modules
-from celebrity_service import increase_sim_celebrity
+from celebrity_service import increase_fame_for_nobles
 import career_service
 import social_service
 import household_service
@@ -13,10 +11,10 @@ import utils
 with open("C:/Users/jiraa/Documents/Electronic Arts/The Sims 4/Mods/jira_mod/output.txt", "w") as f:
     print("File cleared")
 
-@sims4.commands.Command('increase_celebrity_by_lastname', command_type=sims4.commands.CommandType.Live)
-def _increase_celebrity_by_lastname(last_name: str = '',  fame_points: int = 1000, _connection=None):
+@sims4.commands.Command('increase_fame_for_nobles', command_type=sims4.commands.CommandType.Live)
+def _increase_fame_for_nobles(_connection=None):
     output = sims4.commands.CheatOutput(_connection)
-    increase_sim_celebrity(last_name, fame_points, output)
+    increase_fame_for_nobles(output)
 
 @sims4.commands.Command('randomize_nobles', command_type=sims4.commands.CommandType.Live)
 def _randomize_nobles(_connection=None):
@@ -51,7 +49,7 @@ def _cleanup_hybrids(_connection=None):
 @sims4.commands.Command('jira.help', command_type=sims4.commands.CommandType.Cheat)
 def _jira_help(_connection=None):
     output = sims4.commands.CheatOutput(_connection)
-    output('increase_celebrity_by_lastname')
+    output('increase_fame_for_nobles')
     output('randomize_nobles')
     output('add_random_career')
     output('find_partner')
@@ -72,7 +70,7 @@ def _say_hello(_connection=None):
 
 @sims4.commands.Command('rename_married_sims', command_type=sims4.commands.CommandType.Live)
 def _randomize_townie_marriage_names(_connection=None):
-    household_service.randomize_townie_marriage_names(sims4.commands.CheatOutput(_connection))
+    household_service.rename_married_sims(sims4.commands.CheatOutput(_connection))
 
 @sims4.commands.Command('rename_unmarried_sims', command_type=sims4.commands.CommandType.Live)
 def _rename_unmarried_sims(_connection=None):
@@ -97,26 +95,3 @@ def _promote_to_queen_king(_connection=None):
 @sims4.commands.Command('cleanup_hustler', command_type=sims4.commands.CommandType.Live)
 def _cleanup_hustler():
     utils.cleanup_hustler()
-
-@sims4.commands.Command('cheat_send_home', command_type=sims4.commands.CommandType.Live)
-def _cheat_send_home(_connection=None):
-    output = sims4.commands.CheatOutput(_connection)
-    try:
-        """
-        Finds all active guests on the current lot who do not live here 
-        and forces them to go to their respective homes.
-        """
-        
-        # Get all spawned Sims in the current zone
-        all_sims = services.sim_info_manager().get_all()
-        
-        sent_count = 0
-        
-        for sim_info in all_sims:
-            output(f"Sending {utils.get_full_name(sim_info)} home...")
-            if send_sim_home(sim_info, output):
-                sent_count += 1
-                    
-        output(f"Successfully sent {sent_count} Sims home.")
-    except Exception as e:
-        output(f"Error: {e}")

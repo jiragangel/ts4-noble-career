@@ -1,3 +1,4 @@
+from career_service import getCareerInstance
 import services # type: ignore
 from sims.sim_info_types import Gender # type: ignore
 import random
@@ -37,55 +38,19 @@ def get_spouse_info_by_id(sim_id):
     return None
 
 def get_name(sim_info):
-    trait_manager = services.get_instance_manager(Types.TRAIT)
-    
-    # if sim_info.has_trait(trait_manager.get(Constants.FAIRY)):
-    #     if sim_info.gender == Gender.FEMALE:
-    #         return random.choice(lists.female_fairy_names)
-    #     else:
-    #         return random.choice(lists.male_fairy_names)
-    
-    # if sim_info.has_trait(trait_manager.get(Constants.MERMAID)):
-    #     if sim_info.gender == Gender.FEMALE:
-    #         return random.choice(lists.female_mermaid_names)
-    #     else:
-    #         return random.choice(lists.male_mermaid_names)
-    
-    # if sim_info.has_trait(trait_manager.get(Constants.WEREWOLF)):
-    #     if sim_info.gender == Gender.FEMALE:
-    #         return random.choice(lists.female_werewolf_names)
-    #     else:
-    #         return random.choice(lists.male_werewolf_names)
-    
-    # if sim_info.has_trait(trait_manager.get(Constants.VAMPIRE)):
-    #     if sim_info.gender == Gender.FEMALE:
-    #         return random.choice(lists.female_vampire_names)
-    #     else:
-    #         return random.choice(lists.male_vampire_names)
         
     if sim_info.gender == Gender.FEMALE:
         return random.choice(lists.female_names)
     else:
         return random.choice(lists.male_names)
 
-def get_surname(sim_info):
-    trait_manager = services.get_instance_manager(Types.TRAIT)
-    
-    # if sim_info.has_trait(trait_manager.get(Constants.MERMAID)):
-    #     return random.choice(lists.get_mermaid_surnames())
-    
-    # if sim_info.has_trait(trait_manager.get(Constants.FAIRY)):
-    #     return random.choice(lists.get_fairy_surnames())
-    
-    # if sim_info.has_trait(trait_manager.get(Constants.WEREWOLF)):
-    #     return random.choice(lists.werewolf_surnames)
-    
-    # if sim_info.has_trait(trait_manager.get(Constants.WITCH)):
-    #     return random.choice(lists.get_spellcaster_surnames())
+def get_surname(is_royal = False):
+    if is_royal:
+        return random.choice(lists.get_royal_surnames())
       
     return random.choice(lists.surnames)
 
-def randomize_townie_marriage_names(output):
+def rename_married_sims(output):
     try:
         processed_sim_ids = []
         count = 0
@@ -106,11 +71,14 @@ def randomize_townie_marriage_names(output):
             if sim_info.gender != Gender.FEMALE: 
                 continue
 
+            sim_info_ci = getCareerInstance(sim_info)
+
             try:
                 spouse_info = get_spouse_info_by_id(sim_info.sim_id)
                 
                 if spouse_info:
-                    new_surname = get_surname(sim_info)
+                    spouse_info_ci = getCareerInstance(spouse_info)
+                    new_surname = get_surname((not sim_info_ci is None) or (not spouse_info_ci is None))
 
                     old_names = f"{sim_info.first_name} {sim_info.last_name} & {spouse_info.first_name} {spouse_info.last_name}"
                     
@@ -178,8 +146,9 @@ def randomize_townie_unmarried(output):
                 if spouse_info:
                     output(f'{sim_info.first_name} {sim_info.last_name} has spouse')
                     continue
-
-                new_surname = get_surname(sim_info)
+                
+                sim_info_ci = getCareerInstance(sim_info)
+                new_surname = get_surname((not sim_info_ci is None))
                 new_firstname = get_name(sim_info)
                     
                 old_names = f"{sim_info.first_name} {sim_info.last_name}"
