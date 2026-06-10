@@ -144,7 +144,6 @@ def randomize_townie_unmarried(output):
                 spouse_info = get_spouse_info_by_id(sim_info.sim_id)
                 
                 if spouse_info:
-                    output(f'{sim_info.first_name} {sim_info.last_name} has spouse')
                     continue
                 
                 sim_info_ci = getCareerInstance(sim_info)

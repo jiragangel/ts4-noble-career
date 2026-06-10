@@ -28,10 +28,15 @@ def add_random_career(output_func):
                 career_instance.promote(promotion_count)
                 output_func(f"Added career to {sim_info.first_name} {sim_info.last_name} and promoted {promotion_count} times.")
 
-def add_noble_career_to_sim(output_func, sim_info, target_career_level = random.randint(1, 6)):
+def add_noble_career_to_sim(output_func, sim_info, target_career_level = None):
     noble_career_id = Constants.NOBLE
     instance_manager = services.get_instance_manager(Types.CAREER)
     noble_career_tuning = instance_manager.get(noble_career_id)
+    randomized_career_level = 1
+    if target_career_level is None:
+        randomized_career_level = random.randint(1, 6)
+    else:
+        randomized_career_level = target_career_level
 
     # Instantiate and add career
     new_career_instance = noble_career_tuning(sim_info)
@@ -44,9 +49,9 @@ def add_noble_career_to_sim(output_func, sim_info, target_career_level = random.
     sim_info.career_tracker.add_career(noble_career_tuning(sim_info))
 
     career_instance = getCareerInstance(sim_info, Constants.NOBLE)
-    if target_career_level > career_instance.level:
-        career_instance.promote(target_career_level - career_instance.level)
-    output_func(f"Added Noble career ({target_career_level}) to {sim_info.first_name} {sim_info.last_name}")
+    if randomized_career_level > career_instance.level:
+        career_instance.promote(randomized_career_level - career_instance.level)
+    output_func(f"Added Noble career ({randomized_career_level}) to {sim_info.first_name} {sim_info.last_name}")
 
 def randomize_nobles(output_func):
     for sim_info in services.sim_info_manager().get_all():
