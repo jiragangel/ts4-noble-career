@@ -23,15 +23,19 @@ def increase_fame_for_nobles(output_func):
     try:
         sim_manager = services.sim_info_manager()
         for sim_info in sim_manager.get_all():
-            ci = getCareerInstance(sim_info)
-            if not ci:
-                continue
-
-            output_func(f"{sim_info.first_name} {sim_info.last_name} is a noble. Process")
             commodity_manager = services.get_instance_manager(Types.STATISTIC)
             fame_commodity = commodity_manager.get(Constants.FAME) # Fame ID
-
             commodity_tracker = sim_info.commodity_tracker
+
+            if commodity_tracker is None:
+                continue
+
+            ci = getCareerInstance(sim_info)
+
+            if not ci:
+                commodity_tracker.set_value(fame_commodity, 0)
+                continue
+
             if commodity_tracker is not None:
                 fame_points = compute_fame_points(ci.level)
                 commodity_tracker.set_value(fame_commodity, fame_points)

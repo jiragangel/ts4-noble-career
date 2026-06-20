@@ -78,7 +78,17 @@ def rename_married_sims(output):
                 
                 if spouse_info:
                     spouse_info_ci = getCareerInstance(spouse_info)
-                    new_surname = get_surname((not sim_info_ci is None) or (not spouse_info_ci is None))
+                    is_royal = (not sim_info_ci is None) or (not spouse_info_ci is None)
+
+                    children_info = get_children_of_sim(sim_info)
+
+                    for child in children_info:
+                        child_info_ci = getCareerInstance(child)
+                        if not child_info_ci is None:
+                            is_royal = True
+                            break
+
+                    new_surname = get_surname(is_royal)
 
                     old_names = f"{sim_info.first_name} {sim_info.last_name} & {spouse_info.first_name} {spouse_info.last_name}"
                     
@@ -93,8 +103,6 @@ def rename_married_sims(output):
                     count += 1
                     log_msg = f"SUCCESS: {old_names} -> {sim_info.first_name} & {spouse_info.first_name} {new_surname}"
                     output(log_msg)
-
-                    children_info = get_children_of_sim(sim_info)
 
                     output(f"{new_surname} has {len(children_info)} kids")
 
