@@ -53,10 +53,18 @@ def add_noble_career_to_sim(output_func, sim_info, target_career_level = None):
         career_instance.promote(randomized_career_level - career_instance.level)
     output_func(f"Added Noble career ({randomized_career_level}) to {sim_info.first_name} {sim_info.last_name}")
 
-def randomize_nobles(output_func):
-    for sim_info in services.sim_info_manager().get_all():
-        if sim_info.is_teen and random.randint(1, 4) == 1 and sim_info.species == Species.HUMAN:
-           add_noble_career_to_sim(output_func, sim_info)
+def randomize_nobles(name, output_func):
+    output_func(f"randomize_nobles name='{name}'")
+    if not name == '':
+        for sim_info in services.sim_info_manager().get_all():
+            output_func(f"{name} {get_full_name(sim_info)}")
+            if name.lower() == get_full_name(sim_info).lower():
+                add_noble_career_to_sim(output_func, sim_info)
+                break
+    else:
+        for sim_info in services.sim_info_manager().get_all():
+            if sim_info.is_teen and random.randint(1, 4) == 1 and sim_info.species == Species.HUMAN:
+                add_noble_career_to_sim(output_func, sim_info)
 
 
 def getCareerInstance(sim_info, career_id = Constants.NOBLE):

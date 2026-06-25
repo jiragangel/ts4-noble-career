@@ -89,8 +89,6 @@ def rename_married_sims(output):
                             break
 
                     new_surname = get_surname(is_royal)
-
-                    old_names = f"{sim_info.first_name} {sim_info.last_name} & {spouse_info.first_name} {spouse_info.last_name}"
                     
                     sim_info.first_name = get_name(sim_info)
                     sim_info.last_name = new_surname
@@ -101,10 +99,6 @@ def rename_married_sims(output):
                     processed_sim_ids.append(spouse_info.sim_id)
                     
                     count += 1
-                    log_msg = f"SUCCESS: {old_names} -> {sim_info.first_name} & {spouse_info.first_name} {new_surname}"
-                    output(log_msg)
-
-                    output(f"{new_surname} has {len(children_info)} kids")
 
                     for child in children_info:
                         child_spouse_info = get_spouse_info_by_id(child.sim_id)
@@ -115,14 +109,13 @@ def rename_married_sims(output):
                             processed_sim_ids.append(child.sim_id)
                     
                     log_msg = f"SUCCESS: {new_surname} family"
+
+                    sim_info.household.name = new_surname
                     output(log_msg)
 
             except Exception as e:
                 output(f"ERR Sim {sim_info.sim_id}: {str(e)}")
                 error_count += 1
-
-        final_msg = f"Completed. Updated {count} couples. Errors: {error_count}"
-        output(final_msg)
         return True
 
     except Exception as e:

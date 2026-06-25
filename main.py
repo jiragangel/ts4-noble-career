@@ -17,9 +17,9 @@ def _increase_fame_for_nobles(_connection=None):
     increase_fame_for_nobles(output)
 
 @sims4.commands.Command('randomize_nobles', command_type=sims4.commands.CommandType.Live)
-def _randomize_nobles(_connection=None):
+def _randomize_nobles(name: str = '', _connection=None):
     output = sims4.commands.CheatOutput(_connection)
-    career_service.randomize_nobles(output)
+    career_service.randomize_nobles(name, output)
 
 @sims4.commands.Command('add_random_career', command_type=sims4.commands.CommandType.Live)
 def _add_random_career(last_name: str = '', _connection=None):
