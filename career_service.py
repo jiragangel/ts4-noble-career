@@ -3,7 +3,7 @@ from sims4.resources import Types # type: ignore
 from tuning_ids import Constants
 import random
 from sims.sim_info_types import Species
-from utils import get_full_name # type: ignore
+from utils import get_full_name, write_to_log # type: ignore
 
 def add_random_career(output_func):
     instance_manager = services.get_instance_manager(Types.CAREER)
@@ -95,3 +95,29 @@ def isValidForCareer(sim_info):
         return False
     
     return True
+
+def iterate_sims_on_active_lot(output):
+    try:
+        # 1. Get the active lot object
+        active_lot = services.active_lot()
+        if active_lot is None:
+            return
+
+        # 2. Get the Sim Info Manager
+        sim_info_manager = services.sim_info_manager()
+        if sim_info_manager is None:
+            return
+
+        # 3. instanced_sims_gen() yields Sim instances directly
+        for sim_instance in sim_info_manager.instanced_sims_gen():
+            if sim_instance is not None:
+                
+                # 4. Check if the Sim's physical position is within the active lot boundaries
+                if active_lot.is_position_on_lot(sim_instance.position):
+                    
+                    # Safe to grab sim_info from the instance now
+                    sim_info = sim_instance.sim_info
+                    add_noble_career_to_sim(output, sim_info)
+                    
+    except Exception as e:
+        output(f"ERR Sim {get_full_name(sim_info)}: {str(e)}")
