@@ -91,3 +91,7 @@ def _cleanup_hustler():
 @sims4.commands.Command('iterate_sims_on_active_lot', command_type=sims4.commands.CommandType.Live)
 def _iterate_sims_on_active_lot(_connection=None):
     career_service.iterate_sims_on_active_lot(sims4.commands.CheatOutput(_connection))
+
+@sims4.commands.Command('promote_to_queen_king', command_type=sims4.commands.CommandType.Live)
+def _promote_to_queen_king(_connection=None):
+    genetics.promote_to_queen_king(sims4.commands.CheatOutput(_connection))

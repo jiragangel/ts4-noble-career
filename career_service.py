@@ -34,7 +34,7 @@ def add_noble_career_to_sim(output_func, sim_info, target_career_level = None):
     noble_career_tuning = instance_manager.get(noble_career_id)
     randomized_career_level = 1
     if target_career_level is None:
-        randomized_career_level = random.randint(1, 6)
+        randomized_career_level = random.randint(0, 8)
     else:
         randomized_career_level = target_career_level
 

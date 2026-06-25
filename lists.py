@@ -298,3 +298,21 @@ def get_exempted_surnames():
             exempted_surnames.append(line.strip())
     
     return exempted_surnames
+
+def get_royal_male_names():
+    royal_male_names = []
+    with open('C:/Users/jiraa/Documents/Electronic Arts/The Sims 4/Mods/jira_mod/names/500_noble_male_names.txt', 'r') as file:
+        for line in file:
+            # Use line.strip() to remove leading/trailing whitespace, including the newline character
+            royal_male_names.append(line.strip())
+    
+    return royal_male_names
+
+def get_royal_female_names():
+    royal_female_names = []
+    with open('C:/Users/jiraa/Documents/Electronic Arts/The Sims 4/Mods/jira_mod/names/500_noble_female_names.txt', 'r') as file:
+        for line in file:
+            # Use line.strip() to remove leading/trailing whitespace, including the newline character
+            royal_female_names.append(line.strip())
+    
+    return royal_female_names

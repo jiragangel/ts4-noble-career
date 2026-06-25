@@ -37,12 +37,17 @@ def get_spouse_info_by_id(sim_id):
     
     return None
 
-def get_name(sim_info):
-        
-    if sim_info.gender == Gender.FEMALE:
-        return random.choice(lists.female_names)
+def get_name(sim_info, is_royal = False):
+    if is_royal:
+        if sim_info.gender == Gender.FEMALE:
+            return random.choice(lists.get_royal_female_names())
+        else:
+            return random.choice(lists.get_royal_male_names())
     else:
-        return random.choice(lists.male_names)
+        if sim_info.gender == Gender.FEMALE:
+            return random.choice(lists.female_names)
+        else:
+            return random.choice(lists.male_names)
 
 def get_surname(is_royal = False):
     if is_royal:
@@ -90,9 +95,9 @@ def rename_married_sims(output):
 
                     new_surname = get_surname(is_royal)
                     
-                    sim_info.first_name = get_name(sim_info)
+                    sim_info.first_name = get_name(sim_info, is_royal)
                     sim_info.last_name = new_surname
-                    spouse_info.first_name = get_name(spouse_info)
+                    spouse_info.first_name = get_name(spouse_info, is_royal)
                     spouse_info.last_name = new_surname
                     
                     processed_sim_ids.append(sim_info.sim_id)
@@ -105,7 +110,7 @@ def rename_married_sims(output):
                         
                         if not child_spouse_info:
                             child.last_name = new_surname
-                            child.first_name = get_name(child)
+                            child.first_name = get_name(child, is_royal)
                             processed_sim_ids.append(child.sim_id)
                     
                     log_msg = f"SUCCESS: {new_surname} family"
@@ -149,7 +154,7 @@ def randomize_townie_unmarried(output):
                 
                 sim_info_ci = getCareerInstance(sim_info)
                 new_surname = get_surname((not sim_info_ci is None))
-                new_firstname = get_name(sim_info)
+                new_firstname = get_name(sim_info, (not sim_info_ci is None))
                     
                 old_names = f"{sim_info.first_name} {sim_info.last_name}"
                 
