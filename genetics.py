@@ -36,16 +36,13 @@ def promote_to_queen_king(output_func):
                 has_king_or_queen = True
 
         if not has_king_or_queen:
-            try:
-                write_to_log("no monarchy")
-                # get highest
-                max_entry = max(royals, key=lambda entry: entry.get("level"))
+            write_to_log("no monarchy")
+            # get highest
+            max_entry = max(royals, key=lambda entry: entry.get("level"))
 
-                sim_career = getCareerInstance(max_entry.get("sim_info"))
+            sim_career = getCareerInstance(max_entry.get("sim_info"))
 
-                if not sim_career is None and 9 - sim_career.level > 0:
-                    full_name = get_full_name(max_entry.get("sim_info"))
-                    output_func(f"{full_name} is promoted by {9 - sim_career.level} levels")
-                    sim_career.promote(9 - sim_career.level)
-            except Exception as e:
-                output_func(f"Error promoting to king/queen: {get_full_name(max_entry.get('sim_info'))} - {str(e)}")
+            if not sim_career is None and 9 - sim_career.level > 0:
+                full_name = get_full_name(max_entry.get("sim_info"))
+                output_func(f"{full_name} is promoted by {9 - sim_career.level} levels")
+                sim_career.promote(9 - sim_career.level)
