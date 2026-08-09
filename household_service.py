@@ -6,6 +6,7 @@ import lists
 from tuning_ids import Constants
 from utils import get_children_of_sim
 from sims4.resources import Types # type: ignore
+from sims.sim_info_types import Species
 
 def update_all_household_funds(amount: int, output_func):
     household_manager = services.household_manager()
@@ -137,13 +138,13 @@ def randomize_townie_unmarried(output):
         all_sims = list(services.sim_info_manager().get_all())
 
         for sim_info in all_sims:
-            if sim_info is None or not hasattr(sim_info, 'sim_id'):
-                continue
-
-            if sim_info.household_id == active_household_id:
+            if sim_info is None or not hasattr(sim_info, 'sim_id') or not sim_info.species == Species.HUMAN:
                 continue
 
             if sim_info.last_name in lists.get_exempted_surnames():
+                continue
+
+            if not (sim_info.is_young_adult or sim_info.is_adult):
                 continue
 
             try:

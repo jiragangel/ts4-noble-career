@@ -1,3 +1,5 @@
+import traceback
+
 import services # type: ignore
 from sims4.resources import Types # type: ignore
 from tuning_ids import Constants
@@ -29,35 +31,68 @@ def add_random_career(output_func):
                 output_func(f"Added career to {sim_info.first_name} {sim_info.last_name} and promoted {promotion_count} times.")
 
 def add_noble_career_to_sim(output_func, sim_info, target_career_level = None):
-    noble_career_id = Constants.NOBLE
-    instance_manager = services.get_instance_manager(Types.CAREER)
-    noble_career_tuning = instance_manager.get(noble_career_id)
-    randomized_career_level = 1
-    if target_career_level is None:
-        randomized_career_level = random.randint(0, 8)
-    else:
-        randomized_career_level = target_career_level
+    try:
+        if getCareerInstance(sim_info, Constants.NOBLE) is not None:
+            return
 
-    # Instantiate and add career
-    new_career_instance = noble_career_tuning(sim_info)
-    sim_info.career_tracker.add_career(new_career_instance)
-    
-    kingdom_manager = services.kingdom_service()
-    kingdom_manager.add_noble_career(sim_info.id)
-    instance_manager = services.get_instance_manager(Types.CAREER)
-    noble_career_tuning = instance_manager.get(Constants.NOBLE)
-    sim_info.career_tracker.add_career(noble_career_tuning(sim_info))
+        instance_manager = services.get_instance_manager(Types.CAREER)
+        noble_career_tuning = instance_manager.get(Constants.NOBLE)
 
-    career_instance = getCareerInstance(sim_info, Constants.NOBLE)
-    if randomized_career_level > career_instance.level:
-        career_instance.promote(randomized_career_level - career_instance.level)
-    output_func(f"Added Noble career ({randomized_career_level}) to {sim_info.first_name} {sim_info.last_name}")
+        # Basic validation to avoid calling into unexpected types
+        if noble_career_tuning is None:
+            output_func(f"ERR: Noble career tuning (id={Constants.NOBLE}) not found")
+            return
+        if not callable(noble_career_tuning):
+            output_func(f"ERR: Noble career tuning is not callable (type={type(noble_career_tuning)})")
+            return
+
+        randomized_career_level = target_career_level if target_career_level is not None else random.randint(0, 8)
+
+        # Instantiate and add career (guarded)
+        try:
+            new_career_instance = noble_career_tuning(sim_info)
+        except Exception:
+            output_func(f"ERR creating Noble career instance: tuning_type={type(noble_career_tuning)}; exc={traceback.format_exc()}")
+            return
+
+        tracker = getattr(sim_info, 'career_tracker', None)
+        if tracker is None:
+            output_func(f"ERR: Sim {get_full_name(sim_info)} has no career tracker")
+            return
+
+        try:
+            sim_info.career_tracker.add_career(new_career_instance)
+        except Exception:
+            output_func(f"ERR adding Noble career to tracker: {traceback.format_exc()}")
+            return
+
+        kingdom_manager = services.kingdom_service()
+        try:
+            if hasattr(kingdom_manager, 'add_noble_career'):
+                kingdom_manager.add_noble_career(sim_info.id)
+        except Exception:
+            output_func(f"WARN: kingdom_service.add_noble_career failed: {traceback.format_exc()}")
+
+        career_instance = getCareerInstance(sim_info, Constants.NOBLE)
+        if career_instance is None:
+            output_func(f"ERR: Could not locate noble career instance after adding for {get_full_name(sim_info)}")
+            return
+
+        if randomized_career_level > getattr(career_instance, 'level', 0):
+            try:
+                career_instance.promote(randomized_career_level - career_instance.level)
+            except Exception:
+                output_func(f"ERR promoting noble career: {traceback.format_exc()}")
+                return
+
+        output_func(f"Added Noble career ({randomized_career_level}) to {sim_info.first_name} {sim_info.last_name}")
+    except Exception as e:
+        output_func(f"ERR Sim {get_full_name(sim_info)}: {traceback.format_exc()}")
 
 def randomize_nobles(name, output_func):
     output_func(f"randomize_nobles name='{name}'")
     if not name == '':
         for sim_info in services.sim_info_manager().get_all():
-            output_func(f"{name} {get_full_name(sim_info)}")
             if name.lower() == get_full_name(sim_info).lower():
                 add_noble_career_to_sim(output_func, sim_info)
                 break
@@ -78,8 +113,17 @@ def getCareerInstance(sim_info, career_id = Constants.NOBLE):
         return None
 
     for career_instance in tracker.careers.values():
-        if isinstance(career_instance, career_target):
-            return career_instance
+        try:
+            if isinstance(career_target, type):
+                if isinstance(career_instance, career_target):
+                    return career_instance
+            else:
+                # Fallback: compare class names when tuning isn't a direct type
+                target_name = getattr(career_target, '__name__', career_target.__class__.__name__)
+                if career_instance.__class__.__name__ == target_name:
+                    return career_instance
+        except Exception:
+            continue
     
     return None
 
@@ -90,8 +134,13 @@ def isValidForCareer(sim_info):
     tracker = sim_info.career_tracker
     if tracker is None:
         return True
+    
+    careers_count = len(tracker.careers.values())
 
-    if len(tracker.careers.values()) > 0:
+    if sim_info.is_teen and careers_count > 1:
+        return False
+
+    if (sim_info.is_young_adult or sim_info.is_adult) and careers_count > 0:
         return False
     
     return True
@@ -117,7 +166,14 @@ def iterate_sims_on_active_lot(output):
                     
                     # Safe to grab sim_info from the instance now
                     sim_info = sim_instance.sim_info
-                    add_noble_career_to_sim(output, sim_info)
+                    output(f"Processing Sim: {get_full_name(sim_info)} (ID: {sim_info.id})")
+                    try:
+                        if isValidForCareer(sim_info):
+                            add_noble_career_to_sim(output, sim_info)
+                        else:
+                            output(f"Sim {get_full_name(sim_info)} is not valid for career assignment.")
+                    except Exception as e:
+                        continue
                     
     except Exception as e:
         output(f"ERR Sim {get_full_name(sim_info)}: {str(e)}")
