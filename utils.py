@@ -41,6 +41,24 @@ def display_all_attributes(object):
 def get_full_name(sim_info):
     return f"{sim_info.first_name} {sim_info.last_name}"
 
+def get_dynasty(sim_info):
+    if sim_info is None:
+        return None
+
+    # Get sim ID
+    sim_id = getattr(sim_info, 'sim_id', None) or getattr(sim_info, 'id', None)
+
+    dynasty_service = services.dynasty_service()
+
+    dynasty = dynasty_service.get_sim_dynasty(sim_id)
+
+    if dynasty is not None:
+        dynasty_name = dynasty.name
+        return dynasty_name
+
+    return None
+
+
 def get_children_of_sim(sim_info):
     """Returns a list of SimInfo objects for all biological/legal children."""
 

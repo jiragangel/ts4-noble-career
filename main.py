@@ -3,10 +3,12 @@ import sims4.commands  # type: ignore
 from celebrity_service import increase_fame_for_nobles
 import career_service
 import social_service
+import services # type: ignore
 import household_service
 import occult_service
 import genetics
 import utils
+from utils import get_dynasty, get_full_name
 
 with open("C:/Users/jiraa/Documents/Electronic Arts/The Sims 4/Mods/jira_mod/output.txt", "w") as f:
     print("File cleared")
@@ -63,6 +65,7 @@ def _jira_help(_connection=None):
     output('rename_unmarried_sims')
     output('create_noble_per_town')
     output('remove_aliens')
+    output('rename_dynasty_members')
 
 @sims4.commands.Command('hellow', command_type=sims4.commands.CommandType.Live)
 def _say_hello(_connection=None):
@@ -87,6 +90,18 @@ def _set_occult_per_family(_connection=None):
 @sims4.commands.Command('cleanup_hustler', command_type=sims4.commands.CommandType.Live)
 def _cleanup_hustler():
     utils.cleanup_hustler()
+
+@sims4.commands.Command('rename_dynasty_members', command_type=sims4.commands.CommandType.Live)
+def _rename_dynasty_members(_connection=None):
+    output = sims4.commands.CheatOutput(_connection)
+    sim_info_manager = services.sim_info_manager()
+
+    for sim_info in sim_info_manager.get_all():
+        dynasty = get_dynasty(sim_info)
+
+        if not dynasty is None:
+            output(f"Dynasty found for {get_full_name(sim_info)}: {dynasty}")
+            sim_info.last_name = dynasty
 
 @sims4.commands.Command('iterate_sims_on_active_lot', command_type=sims4.commands.CommandType.Live)
 def _iterate_sims_on_active_lot(_connection=None):
