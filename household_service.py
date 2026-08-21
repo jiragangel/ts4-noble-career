@@ -140,10 +140,10 @@ def randomize_townie_unmarried(output):
             if sim_info is None or not hasattr(sim_info, 'sim_id'):
                 continue
 
-            if sim_info.household_id == active_household_id:
+            if sim_info.last_name in lists.get_exempted_surnames():
                 continue
 
-            if sim_info.last_name in lists.get_exempted_surnames():
+            if not sim_info.is_teen_or_older:
                 continue
 
             try:

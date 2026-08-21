@@ -110,3 +110,28 @@ def _iterate_sims_on_active_lot(_connection=None):
 @sims4.commands.Command('promote_to_queen_king', command_type=sims4.commands.CommandType.Live)
 def _promote_to_queen_king(_connection=None):
     genetics.promote_to_queen_king(sims4.commands.CheatOutput(_connection))
+
+@sims4.commands.Command('count_households', command_type=sims4.commands.CommandType.Live)
+def count_households_command(_connection=None):
+    output = sims4.commands.CheatOutput(_connection)
+    
+    # Access the household manager service
+    household_manager = services.household_manager()
+    if household_manager is None:
+        output("Household manager not found.")
+        return
+
+    # Get all households (returns a list/generator of Household objects)
+    households = household_manager.get_all()
+    
+    output(f"Total Households: {len(households)}")
+    
+    for household in households:
+        # household.name gives the household name
+        # household.member_count gives the total Sims count in the household
+        name = household.name
+        size = household.household_size
+
+        if size >= 8:
+            output(f"Household: {name} | Size: {size}")
+            utils.write_to_log(f"Household: {name} | Size: {size}")
