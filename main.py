@@ -52,24 +52,22 @@ def _cleanup_hybrids(_connection=None):
 def _jira_help(_connection=None):
     output = sims4.commands.CheatOutput(_connection)
     output('increase_fame_for_nobles')
-    output('randomize_nobles')
-    output('add_random_career')
-    output('find_partner')
-    output('set_all_household_funds')
+    output('randomize_nobles [name]')
+    output('add_random_career [last_name]')
+    output('find_partner [first_name] [last_name]')
+    output('set_all_household_funds [amount=100000]')
     output('randomize_new_occults')
     output('cleanup_hybrids')
     output('jira.help')
-    output('promote_all_nobles')
-    output('hellow')
     output('rename_married_sims')
     output('rename_unmarried_sims')
-    output('create_noble_per_town')
     output('remove_aliens')
+    output('set_occult_per_family')
+    output('cleanup_hustler')
     output('rename_dynasty_members')
-
-@sims4.commands.Command('hellow', command_type=sims4.commands.CommandType.Live)
-def _say_hello(_connection=None):
-    sims4.commands.CheatOutput(_connection)('Hello World')
+    output('iterate_sims_on_active_lot')
+    output('promote_to_queen_king')
+    output('count_households')
 
 @sims4.commands.Command('rename_married_sims', command_type=sims4.commands.CommandType.Live)
 def _randomize_townie_marriage_names(_connection=None):
