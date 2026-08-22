@@ -49,25 +49,40 @@ def _cleanup_hybrids(_connection=None):
     occult_service.cleanup_hybrids(output)
 
 @sims4.commands.Command('jira.help', command_type=sims4.commands.CommandType.Cheat)
-def _jira_help(_connection=None):
+def _jira_help(option: int = 0, _connection=None):
     output = sims4.commands.CheatOutput(_connection)
-    output('increase_fame_for_nobles')
-    output('randomize_nobles [name]')
-    output('add_random_career [last_name]')
-    output('find_partner [first_name] [last_name]')
-    output('set_all_household_funds [amount=100000]')
-    output('randomize_new_occults')
-    output('cleanup_hybrids')
-    output('jira.help')
-    output('rename_married_sims')
-    output('rename_unmarried_sims')
-    output('remove_aliens')
-    output('set_occult_per_family')
-    output('cleanup_hustler')
-    output('rename_dynasty_members')
-    output('iterate_sims_on_active_lot')
-    output('promote_to_queen_king')
-    output('count_households')
+    commands = [
+        'increase_fame_for_nobles',
+        'randomize_nobles [name]',
+        'add_random_career [last_name]',
+        'find_partner [first_name] [last_name]',
+        'set_all_household_funds [amount=100000]',
+        'randomize_new_occults',
+        'cleanup_hybrids',
+        'jira.help [option]',
+        'rename_married_sims',
+        'rename_unmarried_sims',
+        'remove_aliens',
+        'set_occult_per_family',
+        'cleanup_hustler',
+        'rename_dynasty_members',
+        'iterate_sims_on_active_lot',
+        'promote_to_queen_king',
+        'count_households',
+    ]
+
+    output('Available commands (run jira.help <number> to select one):')
+    for index, command in enumerate(commands, start=1):
+        output(f'{index}. {command}')
+
+    if option == 0:
+        return
+
+    if option < 1 or option > len(commands):
+        output(f'Invalid option. Choose a number from 1 to {len(commands)}.')
+        return
+
+    output(f'Selected: {commands[option - 1]}')
 
 @sims4.commands.Command('rename_married_sims', command_type=sims4.commands.CommandType.Live)
 def _randomize_townie_marriage_names(_connection=None):
