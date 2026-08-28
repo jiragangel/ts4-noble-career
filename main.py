@@ -49,7 +49,7 @@ def _cleanup_hybrids(_connection=None):
     occult_service.cleanup_hybrids(output)
 
 @sims4.commands.Command('jira.help', command_type=sims4.commands.CommandType.Cheat)
-def _jira_help(option: int = 0, _connection=None):
+def _jira_help(option: int = 0, *args, _connection=None):
     output = sims4.commands.CheatOutput(_connection)
     commands = [
         'increase_fame_for_nobles',
@@ -107,9 +107,9 @@ def _jira_help(option: int = 0, _connection=None):
     if selected_command == 'cleanup_hustler':
         handler()
     elif selected_command == 'jira.help [option]':
-        handler(_connection=_connection)
+        handler(*args, _connection=_connection)
     else:
-        handler(_connection)
+        handler(*args, _connection=_connection)
 
 @sims4.commands.Command('rename_married_sims', command_type=sims4.commands.CommandType.Live)
 def _randomize_townie_marriage_names(_connection=None):
