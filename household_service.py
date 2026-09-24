@@ -64,16 +64,10 @@ def rename_married_sims(output):
         all_sims = list(services.sim_info_manager().get_all())
 
         for sim_info in all_sims:
-            if sim_info is None or not hasattr(sim_info, 'sim_id'):
-                continue
-
             if sim_info.last_name in lists.get_exempted_surnames():
                 continue
 
             if sim_info.sim_id in processed_sim_ids:
-                continue
-
-            if sim_info.gender != Gender.FEMALE: 
                 continue
 
             sim_info_ci = getCareerInstance(sim_info)

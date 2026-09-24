@@ -1,3 +1,5 @@
+import random
+
 from utils import check_bit_on_sim, display_all_attributes, get_full_name
 import services # type: ignore
 from sims4.resources import Types # type: ignore
@@ -8,7 +10,9 @@ def get_partner(target_sim, output_func):
     sim_manager = services.sim_info_manager()
     bit_manager = services.get_instance_manager(Types.RELATIONSHIP_BIT)
     match_sim = None
-    for sim in sim_manager.get_all():
+    sims = list(sim_manager.get_all())
+    random.shuffle(sims)
+    for sim in sims:
         if sim.sim_id != target_sim.sim_id and sim.age == target_sim.age and sim.gender != target_sim.gender and not check_bit_on_sim(sim, target_sim, bit_manager.get(Constants.BROKEN_UP)):
             # Check for existing partner bit (15825)
             if not any((bit.guid64 == Constants.PARTNER or bit.guid64 == Constants.SECRET_LOVER) for bit in sim.relationship_tracker.get_all_bits()) and get_full_name(sim) != 'Grim Reaper':
