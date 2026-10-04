@@ -58,6 +58,77 @@ def get_dynasty(sim_info):
 
     return None
 
+def iterate_over_clubs(output):
+    club_service = services.get_club_service()
+
+    while len(club_service.clubs) > 0:
+        club = next(iter(club_service.clubs))
+
+        display_all_attributes(club)
+        output(f"Club: {club.name}")
+
+        club_service.remove_club(club)
+
+
+def iterate_over_dynasties(output):
+    dynasty_service = services.dynasty_service()
+
+    translations = [
+        {
+            "name": "Montez",
+            "description": "After generations of drama and conflict with the Caputo family, the Montez family is ready to rise from the ashes and reclaim their power."
+        },
+        {
+            "name": "Alto",
+            "description": "Passion, love, and toxicity... These are the hallmarks of the Alto family."
+        },
+        {
+            "name": "Caputo",
+            "description": "Everyone in Bellacorde admires the Caputo family and its motto: Honor Sets Us Apart. They belong to an illustrious Dynasty known by many as romantic, gallant, and proud. However, some also describe them as presumptuous, elitist, and melodramatic."
+        },
+        {
+            "name": "Darongue",
+            "description": "The Darongue family belongs to a philanthropic Dynasty that has worked for generations to lead Dambele into a golden age of art and prosperity. The family's motto is known throughout Dambele: Strength Lies in Unity."
+        },
+        {
+            "name": "Tebas",
+            "description": "Strong as the tides, fierce as the sea, the Tebas family is known for its motto, We Face the Storm. This Dynasty takes great pride in its adventures and the treasures it has collected, while boasting a mixed lineage of princesses and pirates."
+        },
+        {
+            "name": "Abrantes",
+            "description": "The Abrantes family has risen through the ranks and is now known as the most refined Dynasty in Verdemar. But don't let appearances deceive you—they always get what they want."
+        },
+        {
+            "name": "Straud",
+            "description": "Vladislaus, a vampire over 200 years old, is the founder of Forgotten Hollow. There is a statue in the town square that Sims believe depicts his great-grandfather, but the vampires know the truth: the sculpture represents Vlad himself, still alive in the shadows of the town."
+        },
+        {
+            "name": "Villareal",
+            "description": "The ancient Villareal family dynasty rules its lands with prestige and mystery. Between noble alliances and ancient secrets, their legacy spans generations and keeps the Villareal family's influence alive."
+        },
+        {
+            "name": "Caixão",
+            "description": "The Caixão family is an aristocratic family with a somewhat dark aura and many hidden secrets. Perhaps their proximity to death is what fuels this deep passion?"
+        },
+        {
+            "name": "Quero-Tudo-Que-É-Seu",
+            "description": "The Quero-Tudo-Que-É-Seu family seems perfect: wealthy, educated, and brilliant. Yet beneath their elegant exterior, they conceal internal conflicts and ruthless intentions."
+        },
+        {
+            "name": "Tebas-Laurent",
+            "description": "The Thebe-Laurent Dynasty has shaped the life of the village for generations. Guardians of the local traditional wedding venue, they have not only turned celebrations into a legacy but also helped drive the local cuisine and marketplace."
+        },
+        {
+            "name": "Feng",
+            "description": "The ancient Feng Dynasty thrives in the shadows of San Myshuno. Victor dominates politics with calculated elegance, while Lílian runs financial empires while concealing cruel and sinister ambitions."
+        }
+    ]
+
+    for dynasty in dynasty_service.get_all_dynasties():
+        details = dynasty_service.get_dynasty(dynasty)
+        details.set_name_and_description(details.name, next((item for item in translations if item["name"] == details.name), None).get("description", "No description available."))
+
+
 
 def get_children_of_sim(sim_info):
     """Returns a list of SimInfo objects for all biological/legal children."""

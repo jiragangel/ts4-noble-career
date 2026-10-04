@@ -8,7 +8,7 @@ import household_service
 import occult_service
 import genetics
 import utils
-from utils import get_dynasty, get_full_name
+from utils import get_dynasty, get_full_name, iterate_over_clubs, iterate_over_dynasties
 
 with open("C:/Users/jiraa/Documents/Electronic Arts/The Sims 4/Mods/jira_mod/output.txt", "w") as f:
     print("File cleared")
@@ -142,6 +142,14 @@ def _rename_dynasty_members(_connection=None):
         if not dynasty is None:
             output(f"Dynasty found for {get_full_name(sim_info)}: {dynasty}")
             sim_info.last_name = dynasty
+
+@sims4.commands.Command('iterate_over_dynasties', command_type=sims4.commands.CommandType.Live)
+def _iterate_over_dynasties(_connection=None):
+    iterate_over_dynasties(sims4.commands.CheatOutput(_connection));
+
+@sims4.commands.Command('iterate_over_clubs', command_type=sims4.commands.CommandType.Live)
+def _iterate_over_clubs(_connection=None):
+    iterate_over_clubs(sims4.commands.CheatOutput(_connection));
 
 @sims4.commands.Command('iterate_sims_on_active_lot', command_type=sims4.commands.CommandType.Live)
 def _iterate_sims_on_active_lot(_connection=None):
