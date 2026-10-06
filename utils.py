@@ -63,8 +63,6 @@ def iterate_over_clubs(output):
 
     while len(club_service.clubs) > 0:
         club = next(iter(club_service.clubs))
-
-        display_all_attributes(club)
         output(f"Club: {club.name}")
 
         club_service.remove_club(club)
