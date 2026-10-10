@@ -69,6 +69,7 @@ def _jira_help(option: int = 0, *args, _connection=None):
         'iterate_sims_on_active_lot',
         'promote_to_queen_king',
         'count_households',
+        'homeless_to_homes',
     ]
 
     if option == 0:
@@ -99,6 +100,7 @@ def _jira_help(option: int = 0, *args, _connection=None):
         'iterate_sims_on_active_lot': _iterate_sims_on_active_lot,
         'promote_to_queen_king': _promote_to_queen_king,
         'count_households': count_households_command,
+        'homeless_to_homes': _homeless_to_homes,
     }
 
     selected_command = commands[option - 1]
@@ -183,3 +185,7 @@ def count_households_command(_connection=None):
         if size >= 8:
             output(f"Household: {name} | Size: {size}")
             utils.write_to_log(f"Household: {name} | Size: {size}")
+
+@sims4.commands.Command('homeless_to_homes', command_type=sims4.commands.CommandType.Live)
+def _homeless_to_homes(_connection=None):
+    household_service.homeless_to_homes(sims4.commands.CheatOutput(_connection))

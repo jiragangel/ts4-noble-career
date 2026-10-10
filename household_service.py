@@ -4,7 +4,7 @@ from sims.sim_info_types import Gender # type: ignore
 import random
 import lists
 from tuning_ids import Constants
-from utils import get_children_of_sim
+from utils import display_all_attributes, get_children_of_sim
 from sims4.resources import Types # type: ignore
 
 def update_all_household_funds(amount: int, output_func):
@@ -17,6 +17,65 @@ def update_all_household_funds(amount: int, output_func):
         except Exception as e:
             output_func(f"Error updating household: {e}")
     output_func(f"Updated {count} households.")
+
+def homeless_to_homes(output_func):
+    try:
+        display_all_attributes(services);
+        household_manager = services.household_manager()
+        persistence_service = services.get_persistence_service()
+        venue_service = services.venue_service()
+        if household_manager is None or persistence_service is None or venue_service is None:
+            output_func("Household, persistence, or venue service not found.")
+            return False
+
+        households = list(household_manager.get_all())
+        occupied_zone_ids = {
+            household.home_zone_id
+            for household in households
+            if household is not None and household.home_zone_id
+        }
+        homeless_households = [
+            household
+            for household in households
+            if household is not None
+            and household.household_size > 0
+            and not household.home_zone_id
+            # MAY DELETE IF INCORRECTLY IDENTIFIED
+            and not any(sim_info.is_ghost for sim_info in household.sim_info_gen())
+        ]
+        vacant_lots = []
+        for lot in persistence_service.get_lots_proto_buff_gen():
+            zone_id = lot.zone_instance_id
+            if not zone_id or zone_id in occupied_zone_ids:
+                continue
+
+            venue = venue_service.get_venue_tuning(zone_id)
+            if venue is not None and venue.is_residential:
+                vacant_lots.append(zone_id)
+
+        moved_households = 0
+        housed_sims = 0
+        for household, zone_id in zip(homeless_households, vacant_lots):
+            try:
+                household.set_household_lot_ownership(zone_id=zone_id)
+                moved_households += 1
+                housed_sims += household.household_size
+                output_func(
+                    f"Moved {household.name} ({household.household_size} Sims) "
+                    f"to residential lot {zone_id}."
+                )
+            except Exception as e:
+                output_func(f"Error moving household {household.name}: {e}")
+
+        remaining_households = len(homeless_households) - moved_households
+        output_func(
+            f"Housed {housed_sims} Sims in {moved_households} households. "
+            f"{remaining_households} homeless households remain."
+        )
+        return True
+    except Exception as e:
+        output_func(f"Error moving homeless households into homes: {e}")
+        return False
 
 def get_spouse_info_by_id(sim_id):
     """
