@@ -71,6 +71,7 @@ def _jira_help(option: int = 0, *args, _connection=None):
         'count_households',
         'homeless_to_homes',
         'move_unmarried_sims_to_homes [same|diff=same]',
+        'add_golden_retrievers_to_households',
     ]
 
     if option == 0:
@@ -103,6 +104,7 @@ def _jira_help(option: int = 0, *args, _connection=None):
         'count_households': count_households_command,
         'homeless_to_homes': _homeless_to_homes,
         'move_unmarried_sims_to_homes [same|diff=same]': _move_unmarried_sims_to_homes,
+        'add_golden_retrievers_to_households': _add_golden_retrievers_to_households,
     }
 
     selected_command = commands[option - 1]
@@ -196,4 +198,13 @@ def _homeless_to_homes(_connection=None):
 def _move_unmarried_sims_to_homes(world_option: str = 'same', _connection=None):
     household_service.move_unmarried_sims_to_homes(
         sims4.commands.CheatOutput(_connection), world_option
+    )
+
+@sims4.commands.Command(
+    'add_golden_retrievers_to_households',
+    command_type=sims4.commands.CommandType.Cheat,
+)
+def _add_golden_retrievers_to_households(_connection=None):
+    household_service.add_golden_retrievers_to_households(
+        sims4.commands.CheatOutput(_connection)
     )

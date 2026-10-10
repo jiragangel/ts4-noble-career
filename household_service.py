@@ -1,11 +1,90 @@
 from career_service import getCareerInstance
 import services # type: ignore
-from sims.sim_info_types import Gender, Species # type: ignore
+from sims.sim_info_types import Age, Gender, Species # type: ignore
+from sims.household_enums import HouseholdChangeOrigin # type: ignore
+from sims.sim_spawner import SimCreator, SimSpawner # type: ignore
 import random
 import lists
 from tuning_ids import Constants
 from utils import display_all_attributes, get_children_of_sim
 from sims4.resources import Types # type: ignore
+
+def add_golden_retrievers_to_households(output_func):
+    try:
+        breed_manager = services.get_instance_manager(Types.BREED)
+        if breed_manager is None:
+            output_func("Breed tuning manager not found.")
+            return False
+
+        golden_retriever_breeds = [
+            breed
+            for breed in breed_manager.types.values()
+            if breed.breed_species == Species.DOG
+            and "".join(
+                character.lower()
+                for character in breed.__name__
+                if character.isalnum()
+            ).endswith("goldenretriever")
+        ]
+        if len(golden_retriever_breeds) != 1:
+            output_func(
+                "Expected one Golden Retriever breed tuning, "
+                f"found {len(golden_retriever_breeds)}."
+            )
+            return False
+
+        breed = golden_retriever_breeds[0]
+        household_manager = services.household_manager()
+        if household_manager is None:
+            output_func("Household manager not found.")
+            return False
+
+        created_count = 0
+        error_count = 0
+        for household in household_manager.get_all():
+            if household is None:
+                continue
+
+            try:
+                sim_creator = SimCreator(
+                    age=Age.ADULT,
+                    gender=random.choice((Gender.FEMALE, Gender.MALE)),
+                    species=breed.breed_species,
+                    additional_tags=(breed.breed_tag,),
+                )
+                sim_infos, _ = SimSpawner.create_sim_infos(
+                    (sim_creator,),
+                    household=household,
+                    account=household.account,
+                    generate_deterministic_sim=True,
+                    zone_id=0,
+                    creation_source="cheat: add_golden_retrievers_to_households",
+                    skip_adding_to_household=True,
+                    household_change_origin=(
+                        HouseholdChangeOrigin.CHEAT_PETS_CREATE_PET_BREED
+                    ),
+                )
+                sim_info = sim_infos[0]
+                sim_info.assign_to_household(household)
+                sim_info.save_sim()
+                household.add_sim_info(
+                    sim_info,
+                    reason=HouseholdChangeOrigin.CHEAT_PETS_CREATE_PET_BREED,
+                )
+                household.save_data()
+                created_count += 1
+            except Exception as e:
+                error_count += 1
+                output_func(f"Error adding a Golden Retriever to a household: {e}")
+
+        output_func(
+            f"Added a Golden Retriever to {created_count} households. "
+            f"Errors: {error_count}."
+        )
+        return error_count == 0
+    except Exception as e:
+        output_func(f"Error adding Golden Retrievers to households: {e}")
+        return False
 
 def update_all_household_funds(amount: int, output_func):
     household_manager = services.household_manager()
