@@ -70,6 +70,7 @@ def _jira_help(option: int = 0, *args, _connection=None):
         'promote_to_queen_king',
         'count_households',
         'homeless_to_homes',
+        'move_unmarried_sims_to_homes [same|diff=same]',
     ]
 
     if option == 0:
@@ -101,6 +102,7 @@ def _jira_help(option: int = 0, *args, _connection=None):
         'promote_to_queen_king': _promote_to_queen_king,
         'count_households': count_households_command,
         'homeless_to_homes': _homeless_to_homes,
+        'move_unmarried_sims_to_homes [same|diff=same]': _move_unmarried_sims_to_homes,
     }
 
     selected_command = commands[option - 1]
@@ -189,3 +191,9 @@ def count_households_command(_connection=None):
 @sims4.commands.Command('homeless_to_homes', command_type=sims4.commands.CommandType.Live)
 def _homeless_to_homes(_connection=None):
     household_service.homeless_to_homes(sims4.commands.CheatOutput(_connection))
+
+@sims4.commands.Command('move_unmarried_sims_to_homes', command_type=sims4.commands.CommandType.Cheat)
+def _move_unmarried_sims_to_homes(world_option: str = 'same', _connection=None):
+    household_service.move_unmarried_sims_to_homes(
+        sims4.commands.CheatOutput(_connection), world_option
+    )

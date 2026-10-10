@@ -1,6 +1,6 @@
 from career_service import getCareerInstance
 import services # type: ignore
-from sims.sim_info_types import Gender # type: ignore
+from sims.sim_info_types import Gender, Species # type: ignore
 import random
 import lists
 from tuning_ids import Constants
@@ -75,6 +75,142 @@ def homeless_to_homes(output_func):
         return True
     except Exception as e:
         output_func(f"Error moving homeless households into homes: {e}")
+        return False
+
+def move_unmarried_sims_to_homes(output_func, world_option="same"):
+    try:
+        world_option = world_option.lower()
+        if world_option not in ("same", "diff"):
+            output_func("Invalid world option. Use 'same' or 'diff'.")
+            return False
+
+        household_manager = services.household_manager()
+        persistence_service = services.get_persistence_service()
+        venue_service = services.venue_service()
+        if household_manager is None or persistence_service is None or venue_service is None:
+            output_func("Household, persistence, or venue service not found.")
+            return False
+
+        households = list(household_manager.get_all())
+        occupied_zone_ids = {
+            household.home_zone_id
+            for household in households
+            if household is not None and household.home_zone_id
+        }
+        vacant_lots_by_world = {}
+        for lot in persistence_service.get_lots_proto_buff_gen():
+            zone_id = lot.zone_instance_id
+            if not zone_id or zone_id in occupied_zone_ids:
+                continue
+
+            zone_data = persistence_service.get_zone_proto_buff(zone_id)
+            venue = venue_service.get_venue_tuning(zone_id)
+            if zone_data is not None and venue is not None and venue.is_residential:
+                vacant_lots_by_world.setdefault(zone_data.world_id, []).append(zone_id)
+
+        moved_count = 0
+        for household in households:
+            if household is None or household.household_size == 0:
+                continue
+
+            household_sims = list(household.sim_info_gen())
+            household_sim_ids = {sim_info.sim_id for sim_info in household_sims}
+            has_married_couple = any(
+                sim_info.spouse_sim_id in household_sim_ids
+                and any(
+                    other_sim_info.sim_id == sim_info.spouse_sim_id
+                    and other_sim_info.spouse_sim_id == sim_info.sim_id
+                    for other_sim_info in household_sims
+                )
+                for sim_info in household_sims
+            )
+            if not has_married_couple:
+                continue
+
+            source_zone_id = household.home_zone_id
+            source_zone_data = (
+                persistence_service.get_zone_proto_buff(source_zone_id)
+                if source_zone_id
+                else None
+            )
+            world_id = source_zone_data.world_id if source_zone_data is not None else None
+            eligible_sims = [
+                sim_info
+                for sim_info in household_sims
+                if sim_info.species == Species.HUMAN
+                and (sim_info.is_young_adult or sim_info.is_adult or sim_info.is_elder)
+                and not sim_info.spouse_sim_id
+            ]
+
+            for sim_info in eligible_sims:
+                available_lots = vacant_lots_by_world.get(world_id, [])
+                if world_option == "diff":
+                    available_lots = [
+                        zone_id
+                        for lot_world_id, zone_ids in vacant_lots_by_world.items()
+                        for zone_id in zone_ids
+                    ]
+                if not available_lots:
+                    world_scope = "any world" if world_option == "diff" else "the same world"
+                    output_func(
+                        f"No available residential lot in {world_scope} for "
+                        f"{sim_info.first_name} {sim_info.last_name}."
+                    )
+                    continue
+
+                zone_id = available_lots[0]
+                vacant_lots_by_world[
+                    next(
+                        lot_world_id
+                        for lot_world_id, zone_ids in vacant_lots_by_world.items()
+                        if zone_id in zone_ids
+                    )
+                ].remove(zone_id)
+                new_household = household_manager.create_household(sim_info.account)
+                if new_household is None:
+                    output_func(
+                        f"Could not create a household for "
+                        f"{sim_info.first_name} {sim_info.last_name}."
+                    )
+                    available_lots.insert(0, zone_id)
+                    continue
+
+                source_lot_cleared = False
+                transfer_completed = False
+                try:
+                    new_household.set_household_lot_ownership(zone_id=zone_id)
+                    if household.household_size == 1:
+                        household.clear_household_lot_ownership()
+                        source_lot_cleared = True
+
+                    moved = household_manager.switch_sim_from_household_to_target_household(
+                        sim_info, household, new_household
+                    )
+                    if not moved:
+                        raise RuntimeError("The Sim could not be transferred to the new household.")
+
+                    transfer_completed = True
+                    moved_count += 1
+                    output_func(
+                        f"Moved {sim_info.first_name} {sim_info.last_name} "
+                        f"to residential lot {zone_id}."
+                    )
+                except Exception as e:
+                    if not transfer_completed and new_household.household_size == 0:
+                        new_household.clear_household_lot_ownership()
+                        new_household.destroy_household_if_empty()
+                    if source_lot_cleared and not transfer_completed:
+                        household.set_household_lot_ownership(zone_id=source_zone_id)
+                    if not transfer_completed:
+                        available_lots.insert(0, zone_id)
+                    output_func(
+                        f"Error moving {sim_info.first_name} {sim_info.last_name}: {e}"
+                    )
+
+        output_func(f"Moved {moved_count} unmarried Sims into separate households.")
+        return True
+    except Exception as e:
+        output_func(f"Error moving unmarried Sims into homes: {e}")
         return False
 
 def get_spouse_info_by_id(sim_id):
