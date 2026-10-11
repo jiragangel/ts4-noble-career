@@ -1,6 +1,7 @@
 import sims4.commands  # type: ignore
 # Import our new modules
 from celebrity_service import increase_fame_for_nobles
+import age_up_service  # Registers the age-up hook.
 import career_service
 import social_service
 import services # type: ignore
@@ -68,6 +69,7 @@ def _jira_help(option: int = 0, *args, _connection=None):
         'rename_dynasty_members',
         'iterate_sims_on_active_lot',
         'promote_to_queen_king',
+        'randomize_married_monarchs',
         'count_households',
         'homeless_to_homes',
         'move_unmarried_sims_to_homes [same|diff=same]',
@@ -101,6 +103,7 @@ def _jira_help(option: int = 0, *args, _connection=None):
         'rename_dynasty_members': _rename_dynasty_members,
         'iterate_sims_on_active_lot': _iterate_sims_on_active_lot,
         'promote_to_queen_king': _promote_to_queen_king,
+        'randomize_married_monarchs': _randomize_married_monarchs,
         'count_households': count_households_command,
         'homeless_to_homes': _homeless_to_homes,
         'move_unmarried_sims_to_homes [same|diff=same]': _move_unmarried_sims_to_homes,
@@ -164,6 +167,13 @@ def _iterate_sims_on_active_lot(_connection=None):
 @sims4.commands.Command('promote_to_queen_king', command_type=sims4.commands.CommandType.Live)
 def _promote_to_queen_king(_connection=None):
     genetics.promote_to_queen_king(sims4.commands.CheatOutput(_connection))
+
+@sims4.commands.Command(
+    'randomize_married_monarchs',
+    command_type=sims4.commands.CommandType.Cheat,
+)
+def _randomize_married_monarchs(_connection=None):
+    genetics.randomize_married_monarchs(sims4.commands.CheatOutput(_connection))
 
 @sims4.commands.Command('count_households', command_type=sims4.commands.CommandType.Live)
 def count_households_command(_connection=None):

@@ -1,6 +1,6 @@
 import random
 
-from utils import check_bit_on_sim, display_all_attributes, get_full_name
+from utils import check_bit_on_sim, get_full_name
 import services # type: ignore
 from sims4.resources import Types # type: ignore
 from tuning_ids import Constants

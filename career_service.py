@@ -38,17 +38,24 @@ def add_noble_career_to_sim(output_func, sim_info, target_career_level = None):
     else:
         randomized_career_level = target_career_level
 
-    # Instantiate and add career
-    new_career_instance = noble_career_tuning(sim_info)
-    sim_info.career_tracker.add_career(new_career_instance)
+    tracker = sim_info.career_tracker
+    if tracker is None:
+        output_func(f"Could not add Noble career to {get_full_name(sim_info)}: career tracker not found.")
+        return
+
+    career_instance = getCareerInstance(sim_info, noble_career_id)
+    if career_instance is None:
+        new_career_instance = noble_career_tuning(sim_info)
+        tracker.add_career(new_career_instance)
     
     kingdom_manager = services.kingdom_service()
     kingdom_manager.add_noble_career(sim_info.id)
-    instance_manager = services.get_instance_manager(Types.CAREER)
-    noble_career_tuning = instance_manager.get(Constants.NOBLE)
-    sim_info.career_tracker.add_career(noble_career_tuning(sim_info))
 
-    career_instance = getCareerInstance(sim_info, Constants.NOBLE)
+    career_instance = getCareerInstance(sim_info, noble_career_id)
+    if career_instance is None:
+        output_func(f"Could not find Noble career for {get_full_name(sim_info)} after adding it.")
+        return
+
     if randomized_career_level > career_instance.level:
         career_instance.promote(randomized_career_level - career_instance.level)
     output_func(f"Added Noble career ({randomized_career_level}) to {sim_info.first_name} {sim_info.last_name}")

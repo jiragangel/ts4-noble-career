@@ -2,7 +2,6 @@ import services # type: ignore
 from sims4.resources import Types # type: ignore
 from tuning_ids import Constants
 from career_service import getCareerInstance
-from utils import display_all_attributes
 
 def compute_fame_points(career_level: int):
     if career_level > 7:
