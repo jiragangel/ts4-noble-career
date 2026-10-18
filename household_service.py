@@ -307,25 +307,228 @@ def move_young_adult_without_noble_parent(sim_info, output_func):
     household_sim_ids = {
         household_sim.sim_id for household_sim in household.sim_info_gen()
     }
+    noble_parent_present = False
     for parent_id in parent_ids & household_sim_ids:
         parent_info = sim_info_manager.get(parent_id)
         if parent_info is not None and getCareerInstance(parent_info) is not None:
-            log_notification(
-                sim_info,
-                f"Keeping {sim_info.first_name} {sim_info.last_name} in "
-                f"{household.name}: a parent in the household has a Noble career."
-            )
-            return True
+            noble_parent_present = True
+            break
 
     household_manager = services.household_manager()
     persistence_service = services.get_persistence_service()
     venue_service = services.venue_service()
-    if (
-        household_manager is None
-        or persistence_service is None
-        or venue_service is None
-    ):
-        log_notification(sim_info, "Household, persistence, or venue service not found.")
+    if household_manager is None:
+        log_notification(sim_info, "Household manager not found.")
+        return False
+
+    if noble_parent_present:
+        def get_ancestor_ids(start_sim):
+            ancestor_ids = set()
+            pending_ids = [start_sim.sim_id]
+            while pending_ids:
+                ancestor_id = pending_ids.pop()
+                if ancestor_id in ancestor_ids:
+                    continue
+                ancestor = sim_info_manager.get(ancestor_id)
+                if ancestor is None or ancestor.genealogy is None:
+                    return None
+                ancestor_ids.add(ancestor_id)
+                pending_ids.extend(ancestor.genealogy.get_parent_sim_ids_gen())
+            return ancestor_ids
+
+        sim_ancestor_ids = get_ancestor_ids(sim_info)
+        if sim_ancestor_ids is None:
+            log_notification(
+                sim_info,
+                f"Could not find an unrelated match for "
+                f"{sim_info.first_name} {sim_info.last_name}: genealogy data is unavailable."
+            )
+            return True
+
+        def has_partner(sim):
+            return bool(sim.spouse_sim_id)
+
+        if has_partner(sim_info):
+            log_notification(
+                sim_info,
+                f"Keeping {sim_info.first_name} {sim_info.last_name} in "
+                f"{household.name}: they already have a partner."
+            )
+            return True
+
+        possible_matches = []
+        sims = list(sim_info_manager.get_all())
+        random.shuffle(sims)
+        for candidate in sims:
+            candidate_household = candidate.household
+            if (
+                candidate.sim_id == sim_info.sim_id
+                or candidate_household is None
+                or candidate_household is household
+                or not candidate.is_young_adult
+                or candidate.gender == sim_info.gender
+                or has_partner(candidate)
+            ):
+                continue
+
+            candidate_ancestor_ids = get_ancestor_ids(candidate)
+            if (
+                candidate_ancestor_ids is not None
+                and sim_ancestor_ids.isdisjoint(candidate_ancestor_ids)
+            ):
+                possible_matches.append(candidate)
+
+        if not possible_matches:
+            log_notification(
+                sim_info,
+                f"Keeping {sim_info.first_name} {sim_info.last_name} in "
+                f"{household.name}: no unrelated, single young adult match was found."
+            )
+            return True
+
+        match_sim = random.choice(possible_matches)
+        match_household = match_sim.household
+        relationship_bit_manager = services.get_instance_manager(
+            Types.RELATIONSHIP_BIT
+        )
+        statistic_manager = services.get_instance_manager(Types.STATISTIC)
+        if relationship_bit_manager is None or statistic_manager is None:
+            log_notification(sim_info, "Could not load relationship managers for marriage.")
+            return True
+
+        married_bit = relationship_bit_manager.get(Constants.MARRIED)
+        has_met_bit = relationship_bit_manager.get(Constants.HAS_MET)
+        friendship_stat = statistic_manager.get(Constants.FRIENDSHIP)
+        romance_stat = statistic_manager.get(Constants.ROMANCE)
+        if (
+            married_bit is None
+            or has_met_bit is None
+            or friendship_stat is None
+            or romance_stat is None
+        ):
+            log_notification(sim_info, "Could not load relationship tuning for marriage.")
+            return True
+
+        source_zone_id = match_household.home_zone_id
+        source_lot_cleared = False
+        transfer_completed = False
+        try:
+            if match_household.household_size == 1:
+                match_household.clear_household_lot_ownership()
+                source_lot_cleared = True
+
+            moved = household_manager.switch_sim_from_household_to_target_household(
+                match_sim,
+                match_household,
+                household,
+            )
+            if not moved:
+                raise RuntimeError("The match could not be transferred to the household.")
+            transfer_completed = True
+
+            sim_info.relationship_tracker.add_relationship_bit(
+                match_sim.sim_id,
+                married_bit,
+            )
+            sim_info.relationship_tracker.add_relationship_bit(
+                match_sim.sim_id,
+                has_met_bit,
+            )
+            sim_info.relationship_tracker.set_relationship_score(
+                match_sim.sim_id,
+                100,
+                friendship_stat,
+            )
+            sim_info.relationship_tracker.set_relationship_score(
+                match_sim.sim_id,
+                100,
+                romance_stat,
+            )
+            match_sim.last_name = sim_info.last_name
+            log_notification(
+                sim_info,
+                f"Moved {match_sim.first_name} {match_sim.last_name} into "
+                f"{household.name} and married them to "
+                f"{sim_info.first_name} {sim_info.last_name}."
+            )
+            return True
+        except Exception as e:
+            match_returned = not transfer_completed
+            if transfer_completed:
+                try:
+                    moved_back = household_manager.switch_sim_from_household_to_target_household(
+                        match_sim,
+                        household,
+                        match_household,
+                    )
+                    if not moved_back:
+                        raise RuntimeError("The match could not be returned to their household.")
+                    match_returned = True
+                except Exception as rollback_error:
+                    log_notification(
+                        sim_info,
+                        f"Error rolling back match for {sim_info.first_name} "
+                        f"{sim_info.last_name}: {rollback_error}"
+                    )
+                try:
+                    sim_info.relationship_tracker.remove_relationship_bit(
+                        match_sim.sim_id,
+                        married_bit,
+                    )
+                except Exception as rollback_error:
+                    log_notification(
+                        sim_info,
+                        f"Error removing incomplete marriage for "
+                        f"{sim_info.first_name} {sim_info.last_name}: "
+                        f"{rollback_error}"
+                    )
+            if (
+                match_returned
+                and source_lot_cleared
+                and match_household.home_zone_id == 0
+            ):
+                match_household.set_household_lot_ownership(zone_id=source_zone_id)
+            log_notification(
+                sim_info,
+                f"Error moving and marrying {match_sim.first_name} "
+                f"{match_sim.last_name}: {e}"
+            )
+            return False
+
+    has_older_sibling = False
+    for sibling in sim_info_manager.get_all():
+        if (
+            sibling.sim_id == sim_info.sim_id
+            or sibling.household is not household
+            or sibling.genealogy is None
+        ):
+            continue
+
+        sibling_parent_ids = set(sibling.genealogy.get_parent_sim_ids_gen())
+        if not parent_ids.intersection(sibling_parent_ids):
+            continue
+
+        if (
+            sibling.is_adult
+            or sibling.is_elder
+            or (
+                sibling.is_young_adult
+                and sibling.age_progress > sim_info.age_progress
+            )
+        ):
+            has_older_sibling = True
+            break
+
+    if not has_older_sibling:
+        log_notification(
+            sim_info,
+            f"Keeping {sim_info.first_name} {sim_info.last_name} in "
+            f"{household.name}: they are the eldest sibling in the household."
+        )
+        return True
+
+    if persistence_service is None or venue_service is None:
+        log_notification(sim_info, "Persistence or venue service not found.")
         return False
 
     occupied_zone_ids = {
