@@ -1,7 +1,10 @@
 import inspect
 import services # type: ignore
 from sims4.resources import Types # type: ignore
+from sims4.localization import LocalizationHelperTuning # type: ignore
+from ui.ui_dialog_notification import UiDialogNotification # type: ignore
 from tuning_ids import Constants # type: ignore
+from world.street import get_street_instance_from_world_id # type: ignore
 
 LOG_FILE_PATH = 'C:/Users/jiraa/Documents/Electronic Arts/The Sims 4/Mods/jira_mod/output.txt'
 
@@ -16,6 +19,15 @@ def write_to_log(message):
     """Simple helper to append lines to our custom text file."""
     with open(LOG_FILE_PATH, 'a', encoding='utf-8') as f:
         f.write(f"{message}\n")
+
+def log_notification(sim_info, message):
+    write_to_log(message)
+    notification = UiDialogNotification.TunableFactory().default(
+        sim_info,
+        title=lambda **kwargs: LocalizationHelperTuning.get_raw_text("Noble Career"),
+        text=lambda **kwargs: LocalizationHelperTuning.get_raw_text(message),
+    )
+    notification.show_dialog()
 
 def display_all_attributes(object):
     all_members = inspect.getmembers(object)
@@ -151,3 +163,14 @@ def cleanup_hustler():
     sim_manager = services.sim_info_manager()
     for sim_info in sim_manager.get_all():
         sim_info.remove_trait(trait_manager.get(Constants.NOBLE_HUSTLER))
+
+def get_world_lot_name(zone_id):
+    persistence_service = services.get_persistence_service()
+    zone_data = persistence_service.get_zone_proto_buff(zone_id)
+    street = get_street_instance_from_world_id(zone_data.world_id)
+    world_name = (
+        street.__name__
+        if street is not None
+        else f"Unknown world {zone_data.world_id}"
+    )
+    return f"{zone_data.name}, {world_name}"

@@ -6,7 +6,7 @@ from sims.sim_spawner import SimCreator, SimSpawner # type: ignore
 import random
 import lists
 from tuning_ids import Constants
-from utils import get_children_of_sim, write_to_log
+from utils import get_children_of_sim, get_world_lot_name, log_notification, write_to_log
 from sims4.resources import Types # type: ignore
 
 def add_golden_retrievers_to_households(output_func):
@@ -271,7 +271,7 @@ def move_unmarried_sims_to_homes(output_func, world_option="same"):
                     moved_count += 1
                     output_func(
                         f"Moved {sim_info.first_name} {sim_info.last_name} "
-                        f"to residential lot {zone_id}."
+                        f"to residential lot {get_world_lot_name(zone_id)}."
                     )
                 except Exception as e:
                     if not transfer_completed and new_household.household_size == 0:
@@ -310,7 +310,8 @@ def move_young_adult_without_noble_parent(sim_info, output_func):
     for parent_id in parent_ids & household_sim_ids:
         parent_info = sim_info_manager.get(parent_id)
         if parent_info is not None and getCareerInstance(parent_info) is not None:
-            write_to_log(
+            log_notification(
+                sim_info,
                 f"Keeping {sim_info.first_name} {sim_info.last_name} in "
                 f"{household.name}: a parent in the household has a Noble career."
             )
@@ -324,7 +325,7 @@ def move_young_adult_without_noble_parent(sim_info, output_func):
         or persistence_service is None
         or venue_service is None
     ):
-        write_to_log("Household, persistence, or venue service not found.")
+        log_notification(sim_info, "Household, persistence, or venue service not found.")
         return False
 
     occupied_zone_ids = {
@@ -348,7 +349,8 @@ def move_young_adult_without_noble_parent(sim_info, output_func):
             vacant_lots.append(zone_id)
 
     if not vacant_lots:
-        write_to_log(
+        log_notification(
+            sim_info,
             f"Could not move {sim_info.first_name} {sim_info.last_name}: "
             "no vacant residential lot is available."
         )
@@ -357,7 +359,8 @@ def move_young_adult_without_noble_parent(sim_info, output_func):
     zone_id = random.choice(vacant_lots)
     new_household = household_manager.create_household(sim_info.account)
     if new_household is None:
-        write_to_log(
+        log_notification(
+            sim_info,
             f"Could not create a household for "
             f"{sim_info.first_name} {sim_info.last_name}."
         )
@@ -379,9 +382,10 @@ def move_young_adult_without_noble_parent(sim_info, output_func):
             raise RuntimeError("The Sim could not be transferred to the new household.")
 
         transfer_completed = True
-        write_to_log(
+        log_notification(
+            sim_info,
             f"Moved {sim_info.first_name} {sim_info.last_name} "
-            f"to residential lot {zone_id}."
+            f"to {get_world_lot_name(zone_id)}."
         )
         return True
     except Exception as e:
@@ -390,7 +394,8 @@ def move_young_adult_without_noble_parent(sim_info, output_func):
             new_household.destroy_household_if_empty()
         if source_lot_cleared and not transfer_completed:
             household.set_household_lot_ownership(zone_id=source_zone_id)
-        write_to_log(
+        log_notification(
+            sim_info,
             f"Error moving {sim_info.first_name} {sim_info.last_name}: {e}"
         )
         return False
