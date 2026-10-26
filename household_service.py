@@ -292,293 +292,435 @@ def move_unmarried_sims_to_homes(output_func, world_option="same"):
         return False
 
 def move_young_adult_without_noble_parent(sim_info, output_func):
-    household = sim_info.household
-    if household is None:
-        output_func(f"Could not move {sim_info.first_name} {sim_info.last_name}: household not found.")
-        return False
+    try:
+        if sim_info is None:
+            output_func("Cannot process age-up for a missing Sim.")
+            return False
 
-    sim_info_manager = services.sim_info_manager()
-    genealogy = sim_info.genealogy
-    parent_ids = (
-        set(genealogy.get_parent_sim_ids_gen())
-        if genealogy is not None
-        else set()
-    )
-    household_sim_ids = {
-        household_sim.sim_id for household_sim in household.sim_info_gen()
-    }
-    noble_parent_present = False
-    for parent_id in parent_ids & household_sim_ids:
-        parent_info = sim_info_manager.get(parent_id)
-        if parent_info is not None and getCareerInstance(parent_info) is not None:
-            noble_parent_present = True
-            break
+        household_manager = services.household_manager()
+        sim_info_manager = services.sim_info_manager()
+        persistence_service = services.get_persistence_service()
+        venue_service = services.venue_service()
+        if (
+            household_manager is None
+            or sim_info_manager is None
+            or persistence_service is None
+            or venue_service is None
+        ):
+            log_notification(sim_info,"Household, Sim, persistence, or venue service not found.")
+            return False
 
-    household_manager = services.household_manager()
-    persistence_service = services.get_persistence_service()
-    venue_service = services.venue_service()
-    if household_manager is None:
-        log_notification(sim_info, "Household manager not found.")
-        return False
-
-    sim_is_noble = getCareerInstance(sim_info) is not None
-    is_noble = noble_parent_present or sim_is_noble
-    should_move_out = not (noble_parent_present and sim_is_noble)
-    if should_move_out:
-        remaining_humans = [
-            household_sim
-            for household_sim in household.sim_info_gen()
-            if household_sim.species == Species.HUMAN
-            and household_sim.is_teen_or_older
-        ]
-        if len(remaining_humans) == 1:
-            log_notification(
-                sim_info,
-                f"Keeping {sim_info.first_name} {sim_info.last_name} in "
-                f"{household.name}: they are the last human teen or older Sim "
-                "in the household."
+        source_household = sim_info.household
+        if source_household is None:
+            log_notification(sim_info,
+                f"Could not process {sim_info.first_name} {sim_info.last_name}: "
+                "current household not found."
             )
+            return False
+
+        parent_ids = (
+            list(sim_info.genealogy.get_parent_sim_ids_gen())
+            if sim_info.genealogy is not None
+            else []
+        )
+
+        def find_vacant_lots(world_id=None):
+            occupied_zone_ids = {
+                household.home_zone_id
+                for household in household_manager.get_all()
+                if household is not None and household.home_zone_id
+            }
+            vacant_lots = []
+            for lot in persistence_service.get_lots_proto_buff_gen():
+                zone_id = lot.zone_instance_id
+                if not zone_id or zone_id in occupied_zone_ids:
+                    continue
+
+                zone_data = persistence_service.get_zone_proto_buff(zone_id)
+                venue = venue_service.get_venue_tuning(zone_id)
+                if (
+                    zone_data is not None
+                    and venue is not None
+                    and venue.is_residential
+                    and (world_id is None or zone_data.world_id == world_id)
+                ):
+                    vacant_lots.append(zone_id)
+            return vacant_lots
+
+        def move_sim_to_household(moving_sim, target_household):
+            current_household = moving_sim.household
+            if current_household is target_household:
+                return True
+
+            moved = household_manager.switch_sim_from_household_to_target_household(
+                moving_sim, current_household, target_household
+            )
+            if not moved:
+                log_notification(sim_info,
+                    f"Could not move {moving_sim.first_name} "
+                    f"{moving_sim.last_name} to the target household."
+                )
+                return False
             return True
 
-        if persistence_service is None or venue_service is None:
-            log_notification(sim_info, "Persistence or venue service not found.")
-            return False
+        def find_spouse_candidate():
+            opposite_gender = {
+                Gender.FEMALE: Gender.MALE,
+                Gender.MALE: Gender.FEMALE,
+            }.get(sim_info.gender)
+            if opposite_gender is None:
+                log_notification(sim_info,
+                    f"Could not find an opposite-sex spouse for "
+                    f"{sim_info.first_name} {sim_info.last_name}: "
+                    "the Sim's gender is not male or female."
+                )
+                return None
 
-        source_zone_id = household.home_zone_id
-        source_zone_data = (
-            persistence_service.get_zone_proto_buff(source_zone_id)
-            if source_zone_id
-            else None
-        )
-        if source_zone_data is None:
-            log_notification(
-                sim_info,
-                f"Could not move {sim_info.first_name} {sim_info.last_name}: "
-                "the current household's world could not be determined."
-            )
-            return False
-
-        occupied_zone_ids = {
-            other_household.home_zone_id
-            for other_household in household_manager.get_all()
-            if other_household is not None and other_household.home_zone_id
-        }
-        vacant_lots = []
-        for lot in persistence_service.get_lots_proto_buff_gen():
-            zone_id = lot.zone_instance_id
-            if not zone_id or zone_id in occupied_zone_ids:
-                continue
-
-            zone_data = persistence_service.get_zone_proto_buff(zone_id)
-            venue = venue_service.get_venue_tuning(zone_id)
+            existing_spouse = get_spouse_info_by_id(sim_info.sim_id)
             if (
-                zone_data is not None
-                and zone_data.world_id == source_zone_data.world_id
-                and venue is not None
-                and venue.is_residential
+                existing_spouse is not None
+                and existing_spouse.gender == opposite_gender
+                and existing_spouse.is_young_adult
+                and existing_spouse.species == Species.HUMAN
             ):
-                vacant_lots.append(zone_id)
+                return existing_spouse
+            if sim_info.spouse_sim_id:
+                return None
 
-        if not vacant_lots:
-            log_notification(
-                sim_info,
-                f"Could not move {sim_info.first_name} {sim_info.last_name}: "
-                "no vacant residential lot is available in the same world."
+            sim_child_ids = {
+                child.sim_id for child in get_children_of_sim(sim_info)
+            }
+            sim_parent_ids = set(parent_ids)
+            candidates = [
+                candidate
+                for candidate in sim_info_manager.get_all()
+                if candidate is not None
+                and candidate.sim_id != sim_info.sim_id
+                and candidate.household is not None
+                and candidate.gender == opposite_gender
+                and candidate.is_young_adult
+                and candidate.species == Species.HUMAN
+                and not candidate.spouse_sim_id
+                and candidate.sim_id not in sim_parent_ids
+                and candidate.sim_id not in sim_child_ids
+                and not (
+                    candidate.genealogy is not None
+                    and sim_parent_ids.intersection(
+                        candidate.genealogy.get_parent_sim_ids_gen()
+                    )
+                )
+            ]
+            return random.choice(candidates) if candidates else None
+
+        def move_spouse_into_household(target_household):
+            spouse = find_spouse_candidate()
+            if spouse is None:
+                log_notification(sim_info,
+                    f"No eligible young adult human spouse found for "
+                    f"{sim_info.first_name} {sim_info.last_name}."
+                )
+                return False
+            if spouse.household is None:
+                log_notification(
+                    sim_info,
+                    f"Could not move spouse {spouse.first_name} "
+                    f"{spouse.last_name}: current household not found.",
+                )
+                return False
+
+            is_existing_spouse = spouse.sim_id == sim_info.spouse_sim_id
+            married_bit = None
+            if not is_existing_spouse:
+                relationship_bit_manager = services.get_instance_manager(
+                    Types.RELATIONSHIP_BIT
+                )
+                statistic_manager = services.get_instance_manager(Types.STATISTIC)
+                if relationship_bit_manager is None or statistic_manager is None:
+                    log_notification(
+                        sim_info, "Could not load relationship managers for marriage."
+                    )
+                    return False
+
+                married_bit = relationship_bit_manager.get(Constants.MARRIED)
+                has_met_bit = relationship_bit_manager.get(Constants.HAS_MET)
+                friendship_stat = statistic_manager.get(Constants.FRIENDSHIP)
+                romance_stat = statistic_manager.get(Constants.ROMANCE)
+                if (
+                    married_bit is None
+                    or has_met_bit is None
+                    or friendship_stat is None
+                    or romance_stat is None
+                ):
+                    log_notification(
+                        sim_info, "Could not load relationship tuning for marriage."
+                    )
+                    return False
+
+            spouse_household = spouse.household
+            source_zone_id = spouse_household.home_zone_id
+            source_lot_cleared = False
+            spouse_moved = spouse_household is target_household
+            marriage_started = False
+            spouse_original_last_name = spouse.last_name
+            try:
+                if not spouse_moved:
+                    if spouse_household.household_size == 1:
+                        spouse_household.clear_household_lot_ownership()
+                        source_lot_cleared = True
+                    if not move_sim_to_household(spouse, target_household):
+                        raise RuntimeError("The spouse could not be transferred.")
+                    spouse_moved = True
+
+                if not is_existing_spouse:
+                    marriage_started = True
+                    sim_info.relationship_tracker.add_relationship_bit(
+                        spouse.sim_id, married_bit
+                    )
+                    sim_info.relationship_tracker.add_relationship_bit(
+                        spouse.sim_id, has_met_bit
+                    )
+                    sim_info.relationship_tracker.set_relationship_score(
+                        spouse.sim_id, 100, friendship_stat
+                    )
+                    sim_info.relationship_tracker.set_relationship_score(
+                        spouse.sim_id, 100, romance_stat
+                    )
+                    spouse.last_name = sim_info.last_name
+
+                log_notification(sim_info,
+                    f"Moved spouse {spouse.first_name} {spouse.last_name} "
+                    f"into household {target_household.name}."
+                )
+                return True
+            except Exception as e:
+                spouse_returned = not spouse_moved
+                if spouse_moved and spouse_household is not target_household:
+                    try:
+                        moved_back = (
+                            household_manager.switch_sim_from_household_to_target_household(
+                                spouse, target_household, spouse_household
+                            )
+                        )
+                        if not moved_back:
+                            raise RuntimeError(
+                                "The spouse could not be returned to their household."
+                            )
+                        spouse_returned = True
+                    except Exception as rollback_error:
+                        log_notification(
+                            sim_info,
+                            f"Error rolling back spouse transfer for "
+                            f"{spouse.first_name} {spouse.last_name}: "
+                            f"{rollback_error}",
+                        )
+                if marriage_started:
+                    try:
+                        sim_info.relationship_tracker.remove_relationship_bit(
+                            spouse.sim_id, married_bit
+                        )
+                        spouse.last_name = spouse_original_last_name
+                    except Exception as rollback_error:
+                        log_notification(
+                            sim_info,
+                            f"Error removing incomplete marriage for "
+                            f"{sim_info.first_name} {sim_info.last_name}: "
+                            f"{rollback_error}",
+                        )
+                if (
+                    spouse_returned
+                    and source_lot_cleared
+                    and spouse_household.home_zone_id == 0
+                ):
+                    spouse_household.set_household_lot_ownership(
+                        zone_id=source_zone_id
+                    )
+                log_notification(
+                    sim_info,
+                    f"Error moving and marrying {spouse.first_name} "
+                    f"{spouse.last_name}: {e}",
+                )
+                return False
+
+        def is_eldest_child_of_noble_parent():
+            household_sims = list(source_household.sim_info_gen())
+            household_sim_ids = {member.sim_id for member in household_sims}
+
+            for parent_id in parent_ids:
+                parent = sim_info_manager.get(parent_id)
+                if parent is None or getCareerInstance(parent) is None:
+                    continue
+
+                children_in_household = [
+                    child
+                    for child in get_children_of_sim(parent)
+                    if child.sim_id in household_sim_ids
+                ]
+                if not children_in_household:
+                    continue
+
+                age_ranks = {
+                    Age.BABY: 0,
+                    Age.INFANT: 1,
+                    Age.TODDLER: 2,
+                    Age.CHILD: 3,
+                    Age.TEEN: 4,
+                    Age.YOUNGADULT: 5,
+                    Age.ADULT: 6,
+                    Age.ELDER: 7,
+                }
+                sim_rank = age_ranks.get(sim_info.age, -1)
+                sim_age = (sim_rank, getattr(sim_info, "age_progress", 0) or 0)
+                oldest_age = max(
+                    (
+                        age_ranks.get(child.age, -1),
+                        getattr(child, "age_progress", 0) or 0,
+                    )
+                    for child in children_in_household
+                )
+                if sim_info.sim_id in household_sim_ids and sim_age >= oldest_age:
+                    return True
+            return False
+
+        if getCareerInstance(sim_info) is not None:
+            source_zone_id = source_household.home_zone_id
+            source_zone_data = (
+                persistence_service.get_zone_proto_buff(source_zone_id)
+                if source_zone_id
+                else None
+            )
+            if source_zone_data is None:
+                log_notification(sim_info,
+                    f"Could not determine the current world for "
+                    f"{sim_info.first_name} {sim_info.last_name}."
+                )
+                return False
+
+            available_lots = find_vacant_lots(source_zone_data.world_id)
+            if not available_lots:
+                log_notification(sim_info,
+                    f"No vacant residential lot in the same world for "
+                    f"{sim_info.first_name} {sim_info.last_name}."
+                )
+                return False
+
+            new_household = household_manager.create_household(sim_info.account)
+            if new_household is None:
+                log_notification(sim_info,
+                    f"Could not create a household for "
+                    f"{sim_info.first_name} {sim_info.last_name}."
+                )
+                return False
+
+            zone_id = available_lots[0]
+            source_lot_cleared = False
+            sim_moved = False
+            try:
+                new_household.set_household_lot_ownership(zone_id=zone_id)
+                if source_household.household_size == 1:
+                    source_household.clear_household_lot_ownership()
+                    source_lot_cleared = True
+
+                if not move_sim_to_household(sim_info, new_household):
+                    raise RuntimeError("The aged-up Sim could not be transferred.")
+                sim_moved = True
+            except Exception:
+                if not sim_moved and new_household.household_size == 0:
+                    new_household.clear_household_lot_ownership()
+                    new_household.destroy_household_if_empty()
+                if source_lot_cleared and not sim_moved:
+                    source_household.set_household_lot_ownership(
+                        zone_id=source_zone_id
+                    )
+                raise
+
+            log_notification(sim_info,
+                f"Moved noble {sim_info.first_name} {sim_info.last_name} "
+                f"to residential lot {get_world_lot_name(zone_id)}."
+            )
+            return move_spouse_into_household(new_household)
+
+        noble_parent = False
+        for parent_id in parent_ids:
+            parent = sim_info_manager.get(parent_id)
+            if parent is not None and getCareerInstance(parent) is not None:
+                noble_parent = True
+                break
+        if noble_parent and is_eldest_child_of_noble_parent():
+            log_notification(sim_info,
+                f"Keeping eldest child {sim_info.first_name} "
+                f"{sim_info.last_name} in the current household."
+            )
+            return move_spouse_into_household(source_household)
+
+        if not noble_parent:
+            eligible_humans = [
+                member
+                for member in source_household.sim_info_gen()
+                if member is not None
+                and member.species == Species.HUMAN
+                and (member.is_young_adult or member.is_adult)
+            ]
+            if (
+                len(eligible_humans) == 1
+                and eligible_humans[0].sim_id == sim_info.sim_id
+            ):
+                log_notification(sim_info,
+                    f"Keeping {sim_info.first_name} {sim_info.last_name} "
+                    "because they are the last young adult or adult human."
+                )
+                return True
+
+        available_lots = find_vacant_lots()
+        if not available_lots:
+            log_notification(sim_info,
+                f"No vacant residential lot found for "
+                f"{sim_info.first_name} {sim_info.last_name}."
             )
             return False
 
-        zone_id = random.choice(vacant_lots)
         new_household = household_manager.create_household(sim_info.account)
         if new_household is None:
-            log_notification(
-                sim_info,
+            log_notification(sim_info,
                 f"Could not create a household for "
                 f"{sim_info.first_name} {sim_info.last_name}."
             )
             return False
 
-        source_zone_id = household.home_zone_id
+        zone_id = available_lots[0]
+        source_zone_id = source_household.home_zone_id
         source_lot_cleared = False
-        transfer_completed = False
+        sim_moved = False
         try:
             new_household.set_household_lot_ownership(zone_id=zone_id)
-            if household.household_size == 1:
-                household.clear_household_lot_ownership()
+            if source_household.household_size == 1:
+                source_household.clear_household_lot_ownership()
                 source_lot_cleared = True
 
-            moved = household_manager.switch_sim_from_household_to_target_household(
-                sim_info, household, new_household
-            )
-            if not moved:
-                raise RuntimeError("The Sim could not be transferred to the new household.")
-
-            transfer_completed = True
-            household = new_household
-            log_notification(
-                sim_info,
-                f"Moved {sim_info.first_name} {sim_info.last_name} "
-                f"to {get_world_lot_name(zone_id)} in the same world."
-            )
-        except Exception as e:
-            if not transfer_completed and new_household.household_size == 0:
+            if not move_sim_to_household(sim_info, new_household):
+                raise RuntimeError("The aged-up Sim could not be transferred.")
+            sim_moved = True
+        except Exception:
+            if not sim_moved and new_household.household_size == 0:
                 new_household.clear_household_lot_ownership()
                 new_household.destroy_household_if_empty()
-            if source_lot_cleared and not transfer_completed:
-                household.set_household_lot_ownership(zone_id=source_zone_id)
-            log_notification(
-                sim_info,
-                f"Error moving {sim_info.first_name} {sim_info.last_name}: {e}"
-            )
-            return False
-    if is_noble:
-        def has_partner(sim):
-            return bool(sim.spouse_sim_id)
+            if source_lot_cleared and not sim_moved and source_zone_id:
+                source_household.set_household_lot_ownership(
+                    zone_id=source_zone_id
+                )
+            raise
 
-        if has_partner(sim_info):
-            log_notification(
-                sim_info,
-                f"Keeping {sim_info.first_name} {sim_info.last_name} in "
-                f"{household.name}: they already have a partner."
-            )
-            return True
-
-        possible_matches = []
-        sims = list(sim_info_manager.get_all())
-        random.shuffle(sims)
-        for candidate in sims:
-            candidate_household = candidate.household
-            if (
-                candidate.sim_id == sim_info.sim_id
-                or candidate_household is None
-                or candidate_household is household
-                or not candidate.is_young_adult
-                or candidate.gender == sim_info.gender
-                or has_partner(candidate)
-            ):
-                continue
-
-            possible_matches.append(candidate)
-
-        if not possible_matches:
-            log_notification(
-                sim_info,
-                f"No unrelated, single young adult match was found for "
-                f"{sim_info.first_name} {sim_info.last_name}; they remain in "
-                f"{household.name}."
-            )
-            return True
-
-        match_sim = random.choice(possible_matches)
-        match_household = match_sim.household
-        relationship_bit_manager = services.get_instance_manager(
-            Types.RELATIONSHIP_BIT
+        log_notification(sim_info,
+            f"Moved {sim_info.first_name} {sim_info.last_name} "
+            f"to residential lot {get_world_lot_name(zone_id)}."
         )
-        statistic_manager = services.get_instance_manager(Types.STATISTIC)
-        if relationship_bit_manager is None or statistic_manager is None:
-            log_notification(sim_info, "Could not load relationship managers for marriage.")
-            return True
-
-        married_bit = relationship_bit_manager.get(Constants.MARRIED)
-        has_met_bit = relationship_bit_manager.get(Constants.HAS_MET)
-        friendship_stat = statistic_manager.get(Constants.FRIENDSHIP)
-        romance_stat = statistic_manager.get(Constants.ROMANCE)
-        if (
-            married_bit is None
-            or has_met_bit is None
-            or friendship_stat is None
-            or romance_stat is None
-        ):
-            log_notification(sim_info, "Could not load relationship tuning for marriage.")
-            return True
-
-        source_zone_id = match_household.home_zone_id
-        source_lot_cleared = False
-        transfer_completed = False
-        try:
-            if match_household.household_size == 1:
-                match_household.clear_household_lot_ownership()
-                source_lot_cleared = True
-
-            moved = household_manager.switch_sim_from_household_to_target_household(
-                match_sim,
-                match_household,
-                household,
-            )
-            if not moved:
-                raise RuntimeError("The match could not be transferred to the household.")
-            transfer_completed = True
-
-            sim_info.relationship_tracker.add_relationship_bit(
-                match_sim.sim_id,
-                married_bit,
-            )
-            sim_info.relationship_tracker.add_relationship_bit(
-                match_sim.sim_id,
-                has_met_bit,
-            )
-            sim_info.relationship_tracker.set_relationship_score(
-                match_sim.sim_id,
-                100,
-                friendship_stat,
-            )
-            sim_info.relationship_tracker.set_relationship_score(
-                match_sim.sim_id,
-                100,
-                romance_stat,
-            )
-            match_sim.last_name = sim_info.last_name
-            log_notification(
-                sim_info,
-                f"Moved {match_sim.first_name} {match_sim.last_name} into "
-                f"{household.name} and married them to "
-                f"{sim_info.first_name} {sim_info.last_name}."
-            )
-            return True
-        except Exception as e:
-            match_returned = not transfer_completed
-            if transfer_completed:
-                try:
-                    moved_back = household_manager.switch_sim_from_household_to_target_household(
-                        match_sim,
-                        household,
-                        match_household,
-                    )
-                    if not moved_back:
-                        raise RuntimeError("The match could not be returned to their household.")
-                    match_returned = True
-                except Exception as rollback_error:
-                    log_notification(
-                        sim_info,
-                        f"Error rolling back match for {sim_info.first_name} "
-                        f"{sim_info.last_name}: {rollback_error}"
-                    )
-                try:
-                    sim_info.relationship_tracker.remove_relationship_bit(
-                        match_sim.sim_id,
-                        married_bit,
-                    )
-                except Exception as rollback_error:
-                    log_notification(
-                        sim_info,
-                        f"Error removing incomplete marriage for "
-                        f"{sim_info.first_name} {sim_info.last_name}: "
-                        f"{rollback_error}"
-                    )
-            if (
-                match_returned
-                and source_lot_cleared
-                and match_household.home_zone_id == 0
-            ):
-                match_household.set_household_lot_ownership(zone_id=source_zone_id)
-            log_notification(
-                sim_info,
-                f"Error moving and marrying {match_sim.first_name} "
-                f"{match_sim.last_name}: {e}"
-            )
-            return False
-
-    if should_move_out:
         return True
+    except Exception as e:
+        log_notification(sim_info,
+            f"Error processing young adult age-up for "
+            f"{getattr(sim_info, 'first_name', 'unknown')} "
+            f"{getattr(sim_info, 'last_name', 'Sim')}: {e}"
+        )
+        return False
 
 def get_spouse_info_by_id(sim_id):
     """
