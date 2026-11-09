@@ -2,9 +2,10 @@
 
 `move_young_adult_without_noble_parent` processes the Sim after they age up to
 young adult. Vacant lots are limited to residential lots. A spouse candidate
-must be a human young adult of the opposite sex; an existing eligible spouse
-is preferred, otherwise an eligible unmarried Sim who is not a parent, child,
-or sibling is selected and married.
+must be a human young adult of the opposite sex with neither a noble career
+nor a parent with a noble career; an existing eligible spouse is preferred,
+otherwise an eligible unmarried Sim who is not a parent, child, or sibling is
+selected and married.
 
 ```mermaid
 flowchart TD
@@ -13,7 +14,7 @@ flowchart TD
     C --> D{"Lot and new household available?"}
     D -- No --> X["Report failure; do not move"]
     D -- Yes --> E["Move Sim into the new household"]
-    E --> F["Find an opposite-sex human young adult spouse"]
+    E --> F["Find an opposite-sex human young adult spouse\nwithout a noble career or noble-career parent"]
     F --> G{"Eligible spouse found and\nmarriage tuning available?"}
     G -- Yes --> H["Move spouse into household and marry them"]
     G -- No --> I["Report that no eligible spouse was found"]

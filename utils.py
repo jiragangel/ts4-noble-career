@@ -1,5 +1,6 @@
 import inspect
 import services # type: ignore
+from distributor.shared_messages import IconInfoData # type: ignore
 from sims4.resources import Types # type: ignore
 from sims4.localization import LocalizationHelperTuning # type: ignore
 from ui.ui_dialog_notification import UiDialogNotification # type: ignore
@@ -27,7 +28,9 @@ def log_notification(sim_info, message):
         title=lambda **kwargs: LocalizationHelperTuning.get_raw_text("Noble Career"),
         text=lambda **kwargs: LocalizationHelperTuning.get_raw_text(message),
     )
-    notification.show_dialog()
+    notification.show_dialog(
+        secondary_icon_override=IconInfoData(obj_instance=sim_info)
+    )
 
 def display_all_attributes(object):
     all_members = inspect.getmembers(object)

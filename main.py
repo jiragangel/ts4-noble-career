@@ -189,6 +189,8 @@ def count_households_command(_connection=None):
     households = household_manager.get_all()
     
     output(f"Total Households: {len(households)}")
+    total_sims = sum(household.household_size for household in households)
+    output(f"Total Sims in all Households: {total_sims}")
     
     for household in households:
         # household.name gives the household name

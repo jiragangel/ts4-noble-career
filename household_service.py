@@ -116,6 +116,7 @@ def homeless_to_homes(output_func):
             household
             for household in households
             if household is not None
+            and not household.hidden
             and household.household_size > 0
             and not household.home_zone_id
             # MAY DELETE IF INCORRECTLY IDENTIFIED
@@ -363,6 +364,20 @@ def move_young_adult_without_noble_parent(sim_info, output_func):
                 return False
             return True
 
+        def has_noble_career_or_parent(candidate):
+            if getCareerInstance(candidate) is not None:
+                return True
+
+            if candidate.genealogy is None:
+                return False
+
+            for parent_id in candidate.genealogy.get_parent_sim_ids_gen():
+                parent = sim_info_manager.get(parent_id)
+                if parent is not None and getCareerInstance(parent) is not None:
+                    return True
+
+            return False
+
         def find_spouse_candidate():
             opposite_gender = {
                 Gender.FEMALE: Gender.MALE,
@@ -382,6 +397,7 @@ def move_young_adult_without_noble_parent(sim_info, output_func):
                 and existing_spouse.gender == opposite_gender
                 and existing_spouse.is_young_adult
                 and existing_spouse.species == Species.HUMAN
+                and not has_noble_career_or_parent(existing_spouse)
             ):
                 return existing_spouse
             if sim_info.spouse_sim_id:
@@ -400,6 +416,7 @@ def move_young_adult_without_noble_parent(sim_info, output_func):
                 and candidate.gender == opposite_gender
                 and candidate.is_young_adult
                 and candidate.species == Species.HUMAN
+                and not has_noble_career_or_parent(candidate)
                 and not candidate.spouse_sim_id
                 and candidate.sim_id not in sim_parent_ids
                 and candidate.sim_id not in sim_child_ids
@@ -601,6 +618,7 @@ def move_young_adult_without_noble_parent(sim_info, output_func):
                     f"No vacant residential lot in the same world for "
                     f"{sim_info.first_name} {sim_info.last_name}."
                 )
+                move_spouse_into_household(source_household)
                 return False
 
             new_household = household_manager.create_household(sim_info.account)
