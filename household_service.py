@@ -759,34 +759,115 @@ def get_spouse_info_by_id(sim_id):
     
     return None
 
-def get_name(sim_info, is_royal = False):
+def _get_name_candidates(sim_info, is_royal = False):
     if is_royal:
         if sim_info.gender == Gender.FEMALE:
-            return random.choice(lists.get_royal_female_names())
-        else:
-            return random.choice(lists.get_royal_male_names())
-    else:
-        if sim_info.gender == Gender.FEMALE:
-            return random.choice(lists.female_names)
-        else:
-            return random.choice(lists.male_names)
+            return lists.get_royal_female_names()
+        return lists.get_royal_male_names()
+
+    if sim_info.gender == Gender.FEMALE:
+        return lists.female_names
+    return lists.male_names
+
+def _get_surname_candidates(is_royal = False):
+    if is_royal:
+        return lists.get_royal_surnames()
+    return lists.surnames
+
+def _get_fallback_name_candidates():
+    return (
+        lists.female_names
+        + lists.male_names
+        + lists.get_royal_female_names()
+        + lists.get_royal_male_names()
+    )
+
+
+def _get_fallback_surname_candidates():
+    return lists.surnames + lists.get_royal_surnames()
+
+def get_name(sim_info, is_royal = False):
+    return random.choice(_get_name_candidates(sim_info, is_royal))
+
+def _get_unique_name(candidates, used_names, fallback_candidates=()):
+    unique_candidates = []
+    seen_candidates = set()
+    for candidate in candidates:
+        normalized_candidate = candidate.strip().casefold()
+        if normalized_candidate and normalized_candidate not in seen_candidates:
+            unique_candidates.append(candidate)
+            seen_candidates.add(normalized_candidate)
+
+    if not unique_candidates:
+        raise ValueError("No names available.")
+
+    available_candidates = [
+        candidate
+        for candidate in unique_candidates
+        if candidate.strip().casefold() not in used_names
+    ]
+    if not available_candidates:
+        if callable(fallback_candidates):
+            fallback_candidates = fallback_candidates()
+
+        available_candidates = [
+            candidate
+            for candidate in fallback_candidates
+            if candidate.strip().casefold() not in used_names
+            and candidate.strip().casefold() not in seen_candidates
+        ]
+
+    if not available_candidates:
+        raise ValueError("No unused names available in the configured name lists.")
+
+    selected_name = random.choice(available_candidates)
+    used_names.add(selected_name.strip().casefold())
+    return selected_name
 
 def get_surname(is_royal = False):
-    if is_royal:
-        return random.choice(lists.get_royal_surnames())
-      
-    return random.choice(lists.surnames)
+    return random.choice(_get_surname_candidates(is_royal))
 
 def rename_married_sims(output):
     try:
+        exempted_surnames = lists.get_exempted_surnames()
         processed_sim_ids = []
         count = 0
         error_count = 0
 
         all_sims = list(services.sim_info_manager().get_all())
+        target_sim_ids = set()
+
+        for candidate in all_sims:
+            if candidate is None or candidate.last_name in exempted_surnames:
+                continue
+
+            spouse_info = get_spouse_info_by_id(candidate.sim_id)
+            if not spouse_info:
+                continue
+
+            target_sim_ids.add(candidate.sim_id)
+            target_sim_ids.add(spouse_info.sim_id)
+            for child in get_children_of_sim(candidate):
+                if not get_spouse_info_by_id(child.sim_id):
+                    target_sim_ids.add(child.sim_id)
+
+        used_first_names = {
+            sim_info.first_name.strip().casefold()
+            for sim_info in all_sims
+            if sim_info is not None
+            and sim_info.sim_id not in target_sim_ids
+            and sim_info.first_name
+        }
+        used_surnames = {
+            sim_info.last_name.strip().casefold()
+            for sim_info in all_sims
+            if sim_info is not None
+            and sim_info.sim_id not in target_sim_ids
+            and sim_info.last_name
+        }
 
         for sim_info in all_sims:
-            if sim_info.last_name in lists.get_exempted_surnames():
+            if sim_info is None or sim_info.last_name in exempted_surnames:
                 continue
 
             if sim_info.sim_id in processed_sim_ids:
@@ -809,11 +890,23 @@ def rename_married_sims(output):
                             is_royal = True
                             break
 
-                    new_surname = get_surname(is_royal)
+                    new_surname = _get_unique_name(
+                        _get_surname_candidates(is_royal),
+                        used_surnames,
+                        _get_fallback_surname_candidates,
+                    )
                     
-                    sim_info.first_name = get_name(sim_info, is_royal)
+                    sim_info.first_name = _get_unique_name(
+                        _get_name_candidates(sim_info, is_royal),
+                        used_first_names,
+                        _get_fallback_name_candidates,
+                    )
                     sim_info.last_name = new_surname
-                    spouse_info.first_name = get_name(spouse_info, is_royal)
+                    spouse_info.first_name = _get_unique_name(
+                        _get_name_candidates(spouse_info, is_royal),
+                        used_first_names,
+                        _get_fallback_name_candidates,
+                    )
                     spouse_info.last_name = new_surname
                     
                     processed_sim_ids.append(sim_info.sim_id)
@@ -826,7 +919,11 @@ def rename_married_sims(output):
                         
                         if not child_spouse_info:
                             child.last_name = new_surname
-                            child.first_name = get_name(child, is_royal)
+                            child.first_name = _get_unique_name(
+                                _get_name_candidates(child, is_royal),
+                                used_first_names,
+                                _get_fallback_name_candidates,
+                            )
                             processed_sim_ids.append(child.sim_id)
                     
                     log_msg = f"SUCCESS: {new_surname} family"
@@ -846,31 +943,54 @@ def rename_married_sims(output):
 def randomize_townie_unmarried(output):
     try:
         active_household_id = services.active_household_id()
+        exempted_surnames = lists.get_exempted_surnames()
         
         count = 0
         error_count = 0
 
         all_sims = list(services.sim_info_manager().get_all())
+        target_sims = [
+            sim_info
+            for sim_info in all_sims
+            if sim_info is not None
+            and hasattr(sim_info, 'sim_id')
+            and sim_info.last_name not in exempted_surnames
+            and (sim_info.is_young_adult or sim_info.is_adult)
+            and not get_spouse_info_by_id(sim_info.sim_id)
+        ]
+        target_sim_ids = {sim_info.sim_id for sim_info in target_sims}
+        used_first_names = {
+            sim_info.first_name.strip().casefold()
+            for sim_info in all_sims
+            if sim_info is not None
+            and sim_info.sim_id not in target_sim_ids
+            and sim_info.first_name
+        }
+        used_surnames = {
+            sim_info.last_name.strip().casefold()
+            for sim_info in all_sims
+            if sim_info is not None
+            and sim_info.sim_id not in target_sim_ids
+            and sim_info.last_name
+        }
 
-        for sim_info in all_sims:
+        for sim_info in target_sims:
             if sim_info is None or not hasattr(sim_info, 'sim_id'):
                 continue
 
-            if sim_info.last_name in lists.get_exempted_surnames():
-                continue
-
-            if not sim_info.is_teen_or_older:
-                continue
-
             try:
-                spouse_info = get_spouse_info_by_id(sim_info.sim_id)
-                
-                if spouse_info:
-                    continue
-                
                 sim_info_ci = getCareerInstance(sim_info)
-                new_surname = get_surname((not sim_info_ci is None))
-                new_firstname = get_name(sim_info, (not sim_info_ci is None))
+                is_royal = not sim_info_ci is None
+                new_surname = _get_unique_name(
+                    _get_surname_candidates(is_royal),
+                    used_surnames,
+                    _get_fallback_surname_candidates,
+                )
+                new_firstname = _get_unique_name(
+                    _get_name_candidates(sim_info, is_royal),
+                    used_first_names,
+                    _get_fallback_name_candidates,
+                )
                     
                 old_names = f"{sim_info.first_name} {sim_info.last_name}"
                 
