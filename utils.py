@@ -21,16 +21,21 @@ def write_to_log(message):
     with open(LOG_FILE_PATH, 'a', encoding='utf-8') as f:
         f.write(f"{message}\n")
 
-def log_notification(sim_info, message):
+def log_notification(sim_info, message, sim_info_2 = None):
     write_to_log(message)
     notification = UiDialogNotification.TunableFactory().default(
         sim_info,
         title=lambda **kwargs: LocalizationHelperTuning.get_raw_text("Noble Career"),
         text=lambda **kwargs: LocalizationHelperTuning.get_raw_text(message),
     )
-    notification.show_dialog(
-        secondary_icon_override=IconInfoData(obj_instance=sim_info)
-    )
+    icon_overrides = {
+        "secondary_icon_override": IconInfoData(
+            obj_instance=sim_info_2 if sim_info_2 is not None else sim_info
+        )
+    }
+    if sim_info_2 is not None:
+        icon_overrides["icon_override"] = IconInfoData(obj_instance=sim_info)
+    notification.show_dialog(**icon_overrides)
 
 def display_all_attributes(object):
     all_members = inspect.getmembers(object)

@@ -379,6 +379,7 @@ def move_young_adult_without_noble_parent(sim_info, output_func):
             return False
 
         def find_spouse_candidate():
+            active_household_id = services.active_household_id()
             opposite_gender = {
                 Gender.FEMALE: Gender.MALE,
                 Gender.MALE: Gender.FEMALE,
@@ -394,6 +395,10 @@ def move_young_adult_without_noble_parent(sim_info, output_func):
             existing_spouse = get_spouse_info_by_id(sim_info.sim_id)
             if (
                 existing_spouse is not None
+                and (
+                    existing_spouse.household is None
+                    or existing_spouse.household.id != active_household_id
+                )
                 and existing_spouse.gender == opposite_gender
                 and existing_spouse.is_young_adult
                 and existing_spouse.species == Species.HUMAN
@@ -413,6 +418,7 @@ def move_young_adult_without_noble_parent(sim_info, output_func):
                 if candidate is not None
                 and candidate.sim_id != sim_info.sim_id
                 and candidate.household is not None
+                and candidate.household.id != active_household_id
                 and candidate.gender == opposite_gender
                 and candidate.is_young_adult
                 and candidate.species == Species.HUMAN
@@ -506,7 +512,8 @@ def move_young_adult_without_noble_parent(sim_info, output_func):
 
                 log_notification(sim_info,
                     f"Moved spouse {spouse.first_name} {spouse.last_name} "
-                    f"into household {target_household.name}."
+                    f"into household {target_household.name}.",
+                    spouse
                 )
                 return True
             except Exception as e:
