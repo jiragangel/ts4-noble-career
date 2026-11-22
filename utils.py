@@ -59,7 +59,7 @@ def display_all_attributes(object):
             write_to_log(f"{name}: {value}")
 
 def get_full_name(sim_info):
-    return f"{sim_info.first_name} {sim_info.last_name}"
+    return f"{sim_info.first_name} {sim_info.last_name}".strip()
 
 def get_dynasty(sim_info):
     if sim_info is None:

@@ -6,7 +6,7 @@ from sims.sim_spawner import SimCreator, SimSpawner # type: ignore
 import random
 import lists
 from tuning_ids import Constants
-from utils import get_children_of_sim, get_world_lot_name, log_notification, write_to_log
+from utils import get_children_of_sim, get_full_name, get_world_lot_name, log_notification, write_to_log
 from sims4.resources import Types # type: ignore
 
 def add_golden_retrievers_to_households(output_func):
@@ -426,6 +426,7 @@ def move_young_adult_without_noble_parent(sim_info, output_func):
                 and not candidate.spouse_sim_id
                 and candidate.sim_id not in sim_parent_ids
                 and candidate.sim_id not in sim_child_ids
+                and get_full_name(candidate) != ""
                 and not (
                     candidate.genealogy is not None
                     and sim_parent_ids.intersection(
@@ -435,12 +436,12 @@ def move_young_adult_without_noble_parent(sim_info, output_func):
             ]
             return random.choice(candidates) if candidates else None
 
-        def move_spouse_into_household(target_household):
+        def move_spouse_into_household(target_household, extra_message=""):
             spouse = find_spouse_candidate()
             if spouse is None:
                 log_notification(sim_info,
                     f"No eligible young adult human spouse found for "
-                    f"{sim_info.first_name} {sim_info.last_name}."
+                    f"{sim_info.first_name} {sim_info.last_name}. " + extra_message
                 )
                 return False
             if spouse.household is None:
@@ -510,9 +511,39 @@ def move_young_adult_without_noble_parent(sim_info, output_func):
                     )
                     spouse.last_name = sim_info.last_name
 
+                if marriage_started:
+                    female = sim_info if sim_info.gender == Gender.FEMALE else spouse
+                    male = spouse if female is sim_info else sim_info
+                    if female.gender == Gender.FEMALE and male.gender == Gender.MALE:
+                        try:
+                            pregnancy_tracker = getattr(female, "pregnancy_tracker", None)
+                            if pregnancy_tracker is None:
+                                log_notification(
+                                    sim_info,
+                                    f"Could not make {female.first_name} "
+                                    f"{female.last_name} pregnant: pregnancy tracker not found.",
+                                    female,
+                                )
+                            else:
+                                is_pregnant = getattr(pregnancy_tracker, "is_pregnant", False)
+                                if callable(is_pregnant):
+                                    is_pregnant = is_pregnant()
+
+                                if not is_pregnant:
+                                    pregnancy_tracker.start_pregnancy(female, male)
+                                    extra_message += f"\nMade {female.first_name} {female.last_name} pregnant."
+                        except Exception as pregnancy_error:
+                            log_notification(
+                                sim_info,
+                                f"Could not make {female.first_name} "
+                                f"{female.last_name} pregnant: "
+                                f"{pregnancy_error}",
+                                female,
+                            )
+
                 log_notification(sim_info,
                     f"Moved spouse {spouse.first_name} {spouse.last_name} "
-                    f"into household {target_household.name}.",
+                    f"into household {target_household.name}.\n" + extra_message,
                     spouse
                 )
                 return True
@@ -621,11 +652,7 @@ def move_young_adult_without_noble_parent(sim_info, output_func):
 
             available_lots = find_vacant_lots(source_zone_data.world_id)
             if not available_lots:
-                log_notification(sim_info,
-                    f"No vacant residential lot in the same world for "
-                    f"{sim_info.first_name} {sim_info.last_name}."
-                )
-                move_spouse_into_household(source_household)
+                move_spouse_into_household(source_household, extra_message=f"No vacant residential lot found in the current world for {sim_info.first_name} {sim_info.last_name}.")
                 return False
 
             new_household = household_manager.create_household(sim_info.account)
