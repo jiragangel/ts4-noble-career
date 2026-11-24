@@ -402,6 +402,7 @@ def move_young_adult_without_noble_parent(sim_info, output_func):
                 and existing_spouse.gender == opposite_gender
                 and existing_spouse.is_young_adult
                 and existing_spouse.species == Species.HUMAN
+                and not existing_spouse.is_ghost
                 and not has_noble_career_or_parent(existing_spouse)
             ):
                 return existing_spouse
@@ -422,6 +423,7 @@ def move_young_adult_without_noble_parent(sim_info, output_func):
                 and candidate.gender == opposite_gender
                 and candidate.is_young_adult
                 and candidate.species == Species.HUMAN
+                and not candidate.is_ghost
                 and not has_noble_career_or_parent(candidate)
                 and not candidate.spouse_sim_id
                 and candidate.sim_id not in sim_parent_ids
