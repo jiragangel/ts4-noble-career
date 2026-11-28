@@ -132,6 +132,8 @@ def homeless_to_homes(output_func):
             if venue is not None and venue.is_residential:
                 vacant_lots.append(zone_id)
 
+        random.shuffle(vacant_lots)
+
         moved_households = 0
         housed_sims = 0
         for household, zone_id in zip(homeless_households, vacant_lots):
